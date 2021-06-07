@@ -22,7 +22,6 @@ Imports:
     dplyr,
     magrittr,
     rlang,
-    utils.nest,
     tibble,
     yaml
 Suggests:
