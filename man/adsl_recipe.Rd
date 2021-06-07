@@ -17,7 +17,7 @@ Recipe for the ADSL dataset
 
 adsl_recipe
 
-
+gen_table_data(adsl_recipe)
 
 }
 \keyword{datasets}

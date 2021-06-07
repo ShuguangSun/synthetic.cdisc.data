@@ -111,7 +111,6 @@ usubj_vars <- c("SITEID", "INVID", "USUBJID")
 #'
 #' @export
 #'
-#'
 #' @examples
 #'
 #' adsl_recipe
