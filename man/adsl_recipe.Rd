@@ -3,7 +3,7 @@
 \docType{data}
 \name{adsl_recipe}
 \alias{adsl_recipe}
-\title{Table and Joint Recipes for CDISC datasets}
+\title{Recipe for the ADSL dataset}
 \format{
 An object of class \code{tbl_df} (inherits from \code{tbl}, \code{data.frame}) with 16 rows and 4 columns.
 }
@@ -11,6 +11,13 @@ An object of class \code{tbl_df} (inherits from \code{tbl}, \code{data.frame}) w
 adsl_recipe
 }
 \description{
-Table and Joint Recipes for CDISC datasets
+Recipe for the ADSL dataset
+}
+\examples{
+
+adsl_recipe
+
+
+
 }
 \keyword{datasets}

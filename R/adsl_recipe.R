@@ -116,7 +116,7 @@ usubj_vars <- c("SITEID", "INVID", "USUBJID")
 #'
 #' adsl_recipe
 #'
-#'
+#' gen_table_data(adsl_recipe)
 #'
 adsl_recipe <- tribble(
   ~variables,       ~dependencies,   ~func,                  ~func_args,
