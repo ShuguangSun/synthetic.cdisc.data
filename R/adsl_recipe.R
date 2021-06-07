@@ -1,24 +1,45 @@
 
 
+                                        #
+#' Helper functions and constants for ADSL
+#'
+#' @rdname adsl_helpers
+#' @export
 s_countries <- c("CHN", "USA", "BRA", "PAK", "NGA", "RUS", "JPN", "GBR", "CAN", "CHE")
+#' @rdname adsl_helpers
+#' @export
 country_site_prob <- c(.5, .121, .077, .077, .075, .052, .046, .025, .014, .003)
 
+#' @rdname adsl_helpers
+#' @export
 s_armcds <- c("ARM A", "ARM B", "ARM C")
+#' @rdname adsl_helpers
+#' @export
 s_armprobs <- rep(1/length(s_armcds), length(s_armcds))
 
 
+#' @rdname adsl_helpers
+#' @export
 s_sex <- c("F", "M", "U", "UNDIFFERENTIATED")
+#' @rdname adsl_helpers
+#' @export
 s_sexprobs <- c(.5, .48, .015, .005)
 
+#' @rdname adsl_helpers
+#' @export
 s_race <- c(
       "ASIAN", "BLACK OR AFRICAN AMERICAN", "WHITE", "AMERICAN INDIAN OR ALASKA NATIVE",
       "MULTIPLE", "NATIVE HAWAIIAN OR OTHER PACIFIC ISLANDER", "OTHER", "UNKNOWN"
 )
+#' @rdname adsl_helpers
+#' @export
 s_raceprobs <- c(.55, .23, .16, .05, .004, .003, .002, .002)
 
 
 ##original code
 ## sapply(rchisq(N, df = 5, ncp = 10), max, 0) + 20,
+#' @rdname adsl_helpers
+#' @export
 rchisq_age <- function(n) {
     rv <- rchisq(n, df = 5, ncp = 10)
     ## this seems silly what is going on with this???
@@ -27,16 +48,27 @@ rchisq_age <- function(n) {
 }
 
 
+#' @rdname adsl_helpers
+#' @export
 s_strat1 <- c("A", "B", "C")
+#' @rdname adsl_helpers
+#' @export
 s_strat2 <- c("S1", "S2")
 
+#' @rdname adsl_helpers
+#' @export
 s_bmrkr2 <- c("LOW", "MEDIUM", "HIGH")
 
 
 
 
 
+#' @rdname adsl_helpers
+#' @export
 trtdtm_varnames <- c("TRTSDTM", "RANDDT", "TRTEDTM")
+
+#' @rdname adsl_helpers
+#' @export
 sample_trtdtmvars<- function(n, study_duration = 2,
                            sys_dtm = as.numeric(strptime("20/2/2019 11:16:16.683", "%d/%m/%Y %H:%M:%OS")),
                            discons = floor(n * .3)) {
@@ -60,7 +92,11 @@ sample_trtdtmvars<- function(n, study_duration = 2,
                TRTEDTM = trtedtm)
 }
 
+#' @rdname adsl_helpers
+#' @export
 eos_varnames <- c("EOSDT", "EOSDY", "EOSSTT", "DSCREAS")
+#' @rdname adsl_helpers
+#' @export
 s_discon <-  c("ADVERSE EVENT",
         "LACK OF EFFICACY",
         "PHYSICIAN DECISION",
@@ -68,6 +104,8 @@ s_discon <-  c("ADVERSE EVENT",
         "WITHDRAWAL BY PARENT/GUARDIAN",
         "WITHDRAWAL BY SUBJECT")
 
+#' @rdname adsl_helpers
+#' @export
 make_eosvars <- function(.df, n = NROW(.df)) {
     eosdt <- as.Date(.df$TRTEDTM)
     eosdy <- as.numeric(ceiling(difftime(.df$TRTEDTM, .df$TRTSDTM, units = "days")))
@@ -87,6 +125,8 @@ make_eosvars <- function(.df, n = NROW(.df)) {
                stringsAsFactors = FALSE)
 }
 
+#' @rdname adsl_helpers
+#' @export
 sample_siteid <- function(.df, n, x, prob) {
     raw <- sample_fct(x = x, prob = prob, n = n)
     siteid <- paste0(.df$COUNTRY, "-", raw)
@@ -95,14 +135,22 @@ sample_siteid <- function(.df, n, x, prob) {
     data.frame(SITEID = siteid, INDIV = siteid, USUBJID = usubjid, stringsAsFactors = FALSE)
 }
 
+#' @rdname adsl_helpers
+#' @export
 arm_varnames <- c("ARM", "ARMCD", "ACTARM", "ACTARMCD")
+#' @rdname adsl_helpers
+#' @export
 sample_armcd <- function(n, narms = 3, armnms = c("ARM A" = "A: Drug X", "ARM B" = "B: Placebo", "ARM C" = "C: Combination") ) {
     armcd <- sample_fct(paste("ARM", LETTERS[1:narms]), n = n)
     arm <- unname(factor(armnms[armcd], levels = armnms))
     data.frame(ARM = arm, ARMCD = armcd, ACTARM = arm, ACTARMCD = armcd)
 }
 
+#' @rdname adsl_helpers
+#' @export
 usubj_deps <- c("STUDYID", "COUNTRY", "SUBJID")
+#' @rdname adsl_helpers
+#' @export
 usubj_vars <- c("SITEID", "INVID", "USUBJID")
 
 
