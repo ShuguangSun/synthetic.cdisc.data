@@ -61,7 +61,14 @@ tte_rel_join_recipe <- tribble(
     "ADSL", "USUBJID", "ARMCD", c("PARAMCD", "PARAM", "LAMBDA", "CNSR_P"), no_deps, join_paramcd_tte, NULL)
 
 #' @rdname adtte_recipes
+#'
 #' @export
+#'
+#' @examples
+#'
+#' ADSL <- gen_table_data(N = 10, recipe = adsl_recipe)
+#' gen_reljoin_table(tte_rel_join_recipe, tte_table_recipe, db = list(ADSL = ADSL))
+#'
 tte_table_recipe <- tribble(
     ~variables, ~dependencies, ~func, ~func_args,
     "CNSR", "CNSR_P", gen_tte_cnsr, NULL,

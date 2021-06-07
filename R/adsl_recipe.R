@@ -109,13 +109,18 @@ usubj_vars <- c("SITEID", "INVID", "USUBJID")
 
 #' Recipe for the ADSL dataset
 #'
+#' Subject Level Dataset
+#'
+#' @details This particular recipe implements a simple generic ADSL dataset.
+#'
+#'
 #' @export
 #'
 #' @examples
 #'
 #' adsl_recipe
 #'
-#' gen_table_data(adsl_recipe)
+#' gen_table_data(N = 10, recipe = adsl_recipe)
 #'
 adsl_recipe <- tribble(
   ~variables,       ~dependencies,   ~func,                  ~func_args,

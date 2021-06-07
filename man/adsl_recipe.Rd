@@ -11,13 +11,16 @@ An object of class \code{tbl_df} (inherits from \code{tbl}, \code{data.frame}) w
 adsl_recipe
 }
 \description{
-Recipe for the ADSL dataset
+Subject Level Dataset
+}
+\details{
+This particular recipe implements a simple generic ADSL dataset.
 }
 \examples{
 
 adsl_recipe
 
-gen_table_data(adsl_recipe)
+gen_table_data(N = 10, recipe = adsl_recipe)
 
 }
 \keyword{datasets}
