@@ -107,9 +107,17 @@ usubj_vars <- c("SITEID", "INVID", "USUBJID")
 
 
 
-#' Table and Joint Recipes for CDISC datasets
-#' @rdname cdisc_recipes
+#' Recipe for the ADSL dataset
+#'
 #' @export
+#'
+#'
+#' @examples
+#'
+#' adsl_recipe
+#'
+#'
+#'
 adsl_recipe <- tribble(
   ~variables,       ~dependencies,   ~func,                  ~func_args,
   "STUDYID",        no_deps,          rep_n,                 list(val = "AB12345"),

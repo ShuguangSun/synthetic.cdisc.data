@@ -17,12 +17,12 @@ Authors@R: c(
 Description: Create synthetic CDISC data.
 Depends:
     R (>= 3.3),
-    tibble
+    tibble,
+    respectibles
 Imports:
     dplyr,
     magrittr,
     rlang,
-    utils.nest,
     tibble,
     yaml
 Suggests:
