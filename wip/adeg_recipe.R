@@ -1,16 +1,18 @@
 
 lookup_adeg <- tribble(
-  ~PARAMCD,     ~PARAM,                ~PARAMU,     ~mean_aval, ~sd_aval, ~ANRLO,   ~ANRHI,
-  "QT",         "QT Duration",         "msec",      350,        100,      200,      500,
-  "PR",         "RR Duration",         "msec",      1050,       300,      600,      1500,
-  "HR",         "Heart Rate",          "beats/min", 70,         20,       40,       100,
-  "ECGINTP",    "ECG Interpretation",  "",          NA_real_,   NA_real_, NA_real_, NA_real_
+  ~PARAMCD,     ~PARAM,                ~PARAMU,      ~EGCAT,         ~mean_aval, ~sd_aval, ~ANRLO,   ~ANRHI,
+  "QT",         "QT Duration",         "msec",       "INTERVAL",     350,        100,      200,      500,
+  "PR",         "RR Duration",         "msec",       "INTERVAL",     1050,       300,      600,      1500,
+  "HR",         "Heart Rate",          "beats/min",  "MEASUREMENT",  70,         20,       40,       100,
+  "ECGINTP",    "ECG Interpretation",  "",           "FINDING",      NA_real_,   NA_real_, NA_real_, NA_real_
 )
 
 #' Helper functions and constants for ADEG
 #'
 
-adeg_varnames <-c("PARAM", "PARAMCD", "ADTM", "AVISIT", "AVISITN", "AVAL", "AVALU", "ABLF", "BASE", "CHG")
+adeg_varnames <- c("ASEQ", "EGSEQ", "EGTESTCD", "EGTEST", "EGCAT",   "ASPID",   "PARAM",    "PARAMCD",  "AVAL",    "AVALC",   "AVALU",
+                   "BASE", "BASEC", "BASETYPE", "ABLFL",  "CHG",     "PCHG",    "DTYPE",    "ANRLO",    "ANRHI",   "ANRIND",  "BNRIND",
+                   "ADTM", "ADY",   "ATPTN",    "AVISIT", "AVISITN", "ONTRTFL", "WORS01FL", "WORS02FL", "ANL01FL", "ANL03FL", "ANL04FL")
 
 s_adeg_paramcd <- c("QT", "RR", "HR", "ECGINTP")
 
@@ -21,16 +23,63 @@ s_adeg_param <- c("QT" = "QT Duration",
 
 s_adeg_paramu <-  c("msec", "msec", "beats/min", "")
 
-avaldescr_sel <- c("ABNORMAL","NORMAL")
 
 join_paramcd_adeg <- function(n, .df, .dbtab) {
-  merge(.dbtab, lookup_adeg, by = "PARAMCD", by.y = "PARAM", all = TRUE)
+    merge(.dbtab, lookup_adeg, by = "ARMCD", by.y = "ARM", all = TRUE)
 }
 
-gen_adeg_aval <- function(n, .df, adesc = avaldesc_sel, ...) {
-  tibble(AVAL = rnorm(nrow(.df), mean = 350, sd = 100)/365.25,
-         AVALU = "YEARS")
+
+avaldescr_sel <- c("ABNORMAL","NORMAL")
+
+
+
+gen_adeg_seq <- function(n, .df, ...) {
+  SEQ <- 1:n()
+  tibble(EGSEQ = SEQ,
+         ASEQ = SEQ
+  )
 }
+
+
+gen_adeg_atptn <- function(n, .df, ...) {
+  tibble(ATPTN = 1)
+}
+
+
+gen_adeg_eg <- function(n, .df, ...) {
+  tibble(EGTESTCD = .df$PARAMCD,
+         EGTEST = .df$PARAM
+  )
+}
+
+
+# gen_adeg_dtype_avisit <- function(n, minimum, .df, ...) {
+#   tibble(DTYPE = NA,
+#          AVISIT = random.cdisc.data:::visit_schedule(visit_format = visit_format, n_assessments = n_assessments, n_days = n_days))
+#   .df %>%
+#     filter(
+#       (AVISIT != "BASELINE" & AVISIT != "SCREENING")
+#       & (.df$ONTRTFL == "Y" | .df$ADTM <= .df$TRTSDTM)
+#     ) %>%
+#     {if (minimum == TRUE) filter(., .df$AVAL == min(.df$AVAL)) %>%
+#         mutate(., DTYPE = "MINIMUM", AVISIT = "POST-BASELINE MINIMUM")
+#      else filter(., .df$AVAL == max(.df$AVAL)) %>%
+#         mutate(., DTYPE = "MAXIMUM", AVISIT = "POST-BASELINE MAXIMUM")
+#     }
+# }
+
+
+gen_adeg_aspid <- function(n, .df, ...) {
+  tibble(ASPID = sample(1:n()))
+}
+
+
+gen_adeg_aval <- function(n, .df, ...) {
+  tibble(AVAL = rnorm(nrow(.df), mean = .df$mean_aval, sd = .df$sd_aval)/365.25,
+         AVALU = "YEARS"
+  )
+}
+
 
 gen_adeg_base <- function(n, .df, ...) {
   tibble(BASE = ifelse(.df$AVISITN >= 0,
@@ -40,11 +89,6 @@ gen_adeg_base <- function(n, .df, ...) {
   )
 }
 
-gen_adeg_chg <- function(n, .df, ...) {
-  tibble(CHG = ifelse(.df$AVISITN > 0, .df$AVAL - .df$BASE, NA),
-         PCHG = ifelse(.df$AVISITN > 0, 100 * (.df$CHG / .df$BASE), NA)
-  )
-}
 
 gen_adeg_descs <- function(n, .df, adesc = avaldescr_sel, ...) {
   n <- NROW(.df)
@@ -52,12 +96,43 @@ gen_adeg_descs <- function(n, .df, adesc = avaldescr_sel, ...) {
                         as.character(sample_fct(adesc, n, prob = c(0.25, 0.75))),
                         as.character(.df$AVAL)),
          BASEC = ifelse(.df$PARAMCD == "ECGINTP",
-                        .df$AVALC[.df$AVISIT == "BASELINE"],
+                        AVALC[.df$AVISIT == "BASELINE"],
                         as.character(.df$BASE))
   )
 }
 
-gen_adeg_anl <- function(n, .df, ...) {
+
+gen_adeg_chg <- function(n, .df, ...) {
+  tibble(CHG = ifelse(.df$AVISITN > 0, .df$AVAL - .df$BASE, NA),
+         PCHG = ifelse(.df$AVISITN > 0, 100 * (CHG / .df$BASE), NA)
+  )
+}
+
+
+gen_adeg_nrind <- function(n, .df, ...) {
+  tibble(ANRIND = factor(case_when(
+          .df$AVAL < .df$ANRLO ~ "LOW",
+          .df$AVAL >= .df$ANRLO & .df$AVAL <= .df$ANRHI ~ "NORMAL",
+          .df$AVAL > .df$ANRHI ~ "HIGH"),
+          levels = c("LOW", "NORMAL", "HIGH")),
+         BNRIND = factor(.df$ANRIND[.df$ABLFL == "Y"],
+          levels = c("LOW", "NORMAL", "HIGH"))
+  )
+}
+
+
+# gen_adeg_ablfl <- function(n, .df, ...) {
+#   tibble(ABLFL = ifelse(toupper(visit_format) == "WEEK" & .df$AVISIT == "BASELINE",
+#                         "Y",
+#                         ifelse(toupper(visit_format) == "CYCLE" & .df$AVISIT == "CYCLE 1 DAY 1",
+#                                "Y",
+#                                "")
+#                         )
+#   )
+# }
+
+
+gen_adeg_anfl <- function(n, .df, ...) {
   tibble(ANL01FL = factor(ifelse(
           (.df$ABLFL == "Y" |  (is.na(.df$DTYPE) & .df$WORS01FL == "Y"))
           & (.df$AVISIT != "SCREENING"),
@@ -75,6 +150,92 @@ gen_adeg_anl <- function(n, .df, ...) {
 }
 
 
+gen_adeg_onfl <- function(n, .df, ...) {
+  tibble(ONTRTFL = factor(case_when(
+          is.na(.df$TRTSDTM) ~ "",
+          is.na(.df$ADTM) ~ "Y",
+          (.df$ADTM < .df$TRTSDTM) ~ "",
+          (.df$ADTM > .df$TRTEDTM) ~ "",
+          TRUE ~ "Y"))
+  )
+}
+
+
+gen_adeg_avisitn <- function(n, .df, ...) {
+  tibble(AVISITN = case_when(
+          .df$AVISIT == "SCREENING" ~ -1,
+          .df$AVISIT == "BASELINE" ~ 0,
+          (grepl("^WEEK", .df$AVISIT) | grepl("^CYCLE", .df$AVISIT)) ~ as.numeric(.df$AVISIT) - 2,
+          TRUE ~ NA_real_)
+  )
+}
+
+
+# #Created function to easily match rows which comply to ONTRTFL derivation
+# flag_variables <- function(data, worst_obs) {
+#
+#   data_compare <- data %>% # nolint
+#     mutate(row_check = seq_len(nrow(data)))
+#
+#   data <- data_compare %>%
+#     { # nolint
+#       if (worst_obs == FALSE) group_by(., .df$USUBJID, .df$PARAMCD, .df$BASETYPE, .df$AVISIT) %>%
+#         arrange(., .df$ADTM, .df$ASPID, .df$EGSEQ)
+#       else group_by(., .df$USUBJID, .df$PARAMCD, .df$BASETYPE)
+#     } %>%
+#     filter(.df$AVISITN > 0 & (.df$ONTRTFL == "Y" | .df$ADTM <= .df$TRTSDTM) & is.na(.df$DTYPE)) %>%
+#     { # nolint
+#       if (worst_obs == TRUE) arrange(., .df$AVALC) %>% filter(., ifelse(
+#         .df$PARAMCD == "ECGINTP",
+#         ifelse(.df$AVALC == "ABNORMAL", .df$AVALC == "ABNORMAL", .df$AVALC == "NORMAL"),
+#         .df$AVAL == min(.df$AVAL)))
+#       else filter(., ifelse(
+#         .df$PARAMCD == "ECGINTP",
+#         .df$AVALC == "ABNORMAL" | .df$AVALC == "NORMAL",
+#         .df$AVAL == min(.df$AVAL)))
+#     } %>%
+#     slice(1) %>%
+#     { # nolint
+#       if (worst_obs == TRUE)
+#         mutate(., new_var = case_when(
+#           (.df$AVALC == "ABNORMAL" | .df$AVALC == "NORMAL") ~ "Y",
+#           (!is.na(.df$AVAL) & is.na(.df$DTYPE)) ~ "Y",
+#           TRUE ~ ""
+#         ))
+#       else
+#         mutate(., new_var = case_when(
+#           (.df$AVALC == "ABNORMAL" | .df$AVALC == "NORMAL") ~ "Y",
+#           (!is.na(.df$AVAL) & is.na(.df$DTYPE)) ~ "Y",
+#           TRUE ~ ""
+#         ))
+#     } %>%
+#     ungroup()
+#
+#   data_compare$new_var <- ifelse(data_compare$row_check %in% data$row_check, "Y", "")
+#   data_compare <- data_compare[, -which(names(data_compare) %in% c("row_check"))]
+#
+#   return(data_compare)
+# }
+#
+# gen_adeg_wors <- function(n, .df, ...) {
+#   tibble(WORS01FL = flag_variables(.df, FALSE)$new_var,
+#          WORS02FL = flag_variables(.df, TRUE)$new_var
+#   )
+# }
+
+
+gen_adeg_adtm <- function(n, .df, study_duration = 2, ...) {
+  secs_per_year <- 31557600
+  study_duration_secs <- secs_per_year * study_duration
+  trtsdt_int <- as.numeric(as.Date(.df$TRTSDTM))
+  trtedt_int <- case_when(!is.na(.df$TRTEDTM) ~ as.numeric(as.Date(.df$TRTEDTM)),
+                          is.na(.df$TRTEDTM) ~ floor(.df$trtsdt_int + (study_duration_secs) / 86400))
+  tibble(ADTM = as.POSIXct((sample(.df$trtsdt_int:.df$trtedt_int, size = 1) * 86400), origin = "1970-01-01"),
+         ADY = ceiling(as.numeric(difftime(ADTM, .df$TRTSDTM, units = "days")))
+  )
+}
+
+
 #' Recipes for creating ADEG CDISC Data
 #'
 #' @rdname adeg_recipes
@@ -86,9 +247,23 @@ adeg_rel_join_recipe <- tribble(
   "ADSL", "USUBJID", "PARAMCD", c("PARAM", "PARAMU", "mean_aval", "sd_aval", "ANRLO", "ANRHI"), no_deps, join_paramcd_adeg, NULL)
 
 adeg_table_recipe <- tribble(
-  ~variables,                  ~dependencies,                                         ~func,                 ~func_args,
-  c("AVAL", "AVALU"),          no_deps,                                               gen_adeg_aval,         NULL,
-  c("BASE", "BASETYPE"),       c("AVAL", "AVISITN", "ABLFL"),                         gen_adeg_base,         NULL
+  ~variables,                          ~dependencies,                                         ~func,                 ~func_args,
+  c("ASEQ", "EGSEQ"),                  no_deps,                                               gen_adeg_seq,          NULL,
+  c("EGTESTCD", "EGTEST"),             no_deps,                                               gen_adeg_eg,           NULL,
+  "ATPTN",                             no_deps,                                               gen_adeg_atptn,        NULL,
+# c("DTYPE", "AVISIT"),                c("ONTRTFL", "ADTM"),                                  gen_adeg_dtype_avisit, list(minimum = TRUE),
+  "ASPID",                             no_deps,                                               gen_adeg_aspid,        NULL,
+  c("AVAL", "AVALU"),                  c("mean_aval", "sd_aval"),                             gen_adeg_aval,         NULL,
+  c("BASE", "BASETYPE"),               c("AVAL", "AVISITN", "ABLFL"),                         gen_adeg_base,         NULL,
+  c("AVALC", "BASEC"),                 c("PARAMCD", "AVAL", "AVISIT", "BASE"),                gen_adeg_descs,        NULL,
+  c("CHG", "PCHG"),                    c("AVISITN", "AVAL", "BASE"),                          gen_adeg_chg,          NULL,
+  c("ANRIND", "BNRIND"),               c("AVAL", "ANRLO", "ANRHI", "ABLFL"),                  gen_adeg_nrind,        NULL,
+# "ABLFL",                             "AVISIT",                                              gen_adeg_ablfl,        NULL,
+  c("ANL01FL", "ANL03FL", "ANL04FL"),  c("ABLFL", "DTYPE", "WORS01FL", "AVISIT", "PARAMCD"),  gen_adeg_anfl,         NULL,
+  "ONTRTFL",                           c("TRTSDTM", "TRTEDTM", "ADTM"),                       gen_adeg_onfl,         NULL,
+  "AVISITN",                           "AVISIT",                                              gen_adeg_avisitn,      NULL,
+# c("WORS01FL", "WORS02FL"),           no_deps,                                               gen_adeg_worsfl,       NULL,
+  c("ADTM", "ADY"),                    c("TRTSDTM", "TRTEDTM"),                               gen_adeg_adtm,         list(study_duration = 2)
 )
 
 
