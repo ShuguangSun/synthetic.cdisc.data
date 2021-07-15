@@ -18,4 +18,10 @@ tte_table_recipe
 \description{
 Recipes for creating ADTTE CDISC Data
 }
+\examples{
+
+ADSL <- gen_table_data(N = 10, recipe = adsl_recipe)
+gen_reljoin_table(tte_rel_join_recipe, tte_table_recipe, db = list(ADSL = ADSL))
+
+}
 \keyword{datasets}

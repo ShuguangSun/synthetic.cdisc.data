@@ -31,6 +31,18 @@ join_paramcd_adeg <- function(n, .df, .dbtab) {
 
 avaldescr_sel <- c("ABNORMAL","NORMAL")
 
+
+#' Generate Sequence Per Number of USUBJID Observation
+#'
+#' @param n
+#' @param .df data frame with required variable `USUBJID`
+#'
+#' @examples
+#' x <- data.frame(USUBJID = rep(1:10, each = 2))
+#'
+#' gen_adeg_seq(NULL, x)
+#' gen_adeg_seq(NULL, data.frame(USUBJID = c('id1', 'id1', 'id2', 'id3', 'id3', 'id3')))
+#'
 gen_adeg_seq <- function(n, .df, ...) {
   spl <- split(seq_along(.df$USUBJID), .df$USUBJID)
   rowgroups <- lapply(spl, function(spli) {
@@ -268,7 +280,7 @@ adeg_rel_join_recipe <- tribble(
 adeg_table_recipe <- tribble(
   ~variables,                          ~dependencies,                                         ~func,                 ~func_args,
   c("ASEQ", "EGSEQ"),                  no_deps,                                               gen_adeg_seq,          NULL,
-  c("EGTESTCD", "EGTEST"),             no_deps,                                               gen_adeg_eg,           NULL,
+  c("EGTESTCD", "EGTEST"),             no_deps,                                               gen_adeg_eq,           NULL,
   "ATPTN",                             no_deps,                                               gen_adeg_atptn,        NULL,
   # c("DTYPE", "AVISIT"),                c("ONTRTFL", "ADTM"),                                  gen_adeg_dtype_avisit, list(minimum = TRUE),
   "ASPID",                             no_deps,                                               gen_adeg_aspid,        NULL,
@@ -288,8 +300,7 @@ adeg_table_recipe <- tribble(
   "AVISITN",                           "AVISIT",                                              gen_adeg_avisitn,      NULL,
   # c("WORS01FL", "WORS02FL"),           no_deps,                                               gen_adeg_worsfl,       NULL,
   "ADTM",                              c("TRTSDTM", "TRTEDTM"),                               gen_adeg_adtm,         list(study_duration = 2),
-
-    "ADY",                               c("ADTM", "TRTSDTM"),                                  gen_adeg_ady,          NULL
+  "ADY",                               c("ADTM", "TRTSDTM"),                                  gen_adeg_ady,          NULL
 )
 
 # ADSL <- gen_table_data(N = 10, recipe = adsl_recipe)
