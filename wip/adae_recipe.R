@@ -3,6 +3,11 @@ adae_scaff <- rand_per_key("USUBJID", mincount = 0, maxcount = 10, prop_present 
 adae_sjrec <- tribble(~foreign_tbl, ~foreign_key, ~func,      ~func_args,
                       "ADSL",       "USUBJID",    adae_scaff, NULL)
 
+adae_rel_join_recipe <- tribble(
+  ~foreign_tbl, ~foreign_key, ~foreign_deps, ~variables, ~dependencies, ~func, ~func_args,
+  "ADSL", "USUBJID", no_deps, c("AETERM", "AESERV"), no_deps, adae_scaff, NULL)
+
+
 join_adae <- function(n, .df, .dbtab) {
   merge(.dbtab, adae_lookup, by = "USUBJID")
 }
@@ -67,3 +72,6 @@ adae_recipe <- tribble(~variables, ~dependencies, ~func,        ~func_args,     
                        dtmvars,    dtmdeps,       gen_ase_dtms, list(study_duration_secs = 1 * secs_per_year), TRUE,
                        aeseqvars,  "USUBJID",     aeseq_func,   NULL,                                          TRUE
                )
+
+
+gen_reljoin_table(adae_rel_join_recipe, adae_recipe, db = list(ADSL = ADSL))

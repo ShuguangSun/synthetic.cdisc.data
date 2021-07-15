@@ -53,6 +53,11 @@ gen_adeg_eg <- function(n, .df, ...) {
   )
 }
 
+gen_adeg_u <- function(n, .df, ...) {
+  tibble(USUBJID = .df$USUBJID
+  )
+}
+
 # gen_adeg_dtype_avisit <- function(n, minimum, .df, ...) {
 #   tibble(DTYPE = NA,
 #          AVISIT = random.cdisc.data:::visit_schedule(visit_format = visit_format, n_assessments = n_assessments, n_days = n_days))
@@ -254,9 +259,11 @@ gen_adeg_ady <- function(n, .df, ...) {
 #' @export
 #'
 
+adae_scaff <- rand_per_key("USUBJID", mincount = 0, maxcount = 10, prop_present = 1)
+
 adeg_rel_join_recipe <- tribble(
   ~foreign_tbl, ~foreign_key, ~foreign_deps, ~variables, ~dependencies, ~func, ~func_args,
-  "ADSL", "USUBJID", "PARAMCD", c("PARAM", "PARAMU", "mean_aval", "sd_aval", "ANRLO", "ANRHI"), no_deps, join_paramcd_adeg, NULL)
+  "ADSL", "USUBJID", "PARAMCD", c("PARAM", "PARAMU", "mean_aval", "sd_aval", "ANRLO", "ANRHI"), no_deps, adae_scaff, NULL)
 
 adeg_table_recipe <- tribble(
   ~variables,                          ~dependencies,                                         ~func,                 ~func_args,
@@ -281,6 +288,10 @@ adeg_table_recipe <- tribble(
   "AVISITN",                           "AVISIT",                                              gen_adeg_avisitn,      NULL,
   # c("WORS01FL", "WORS02FL"),           no_deps,                                               gen_adeg_worsfl,       NULL,
   "ADTM",                              c("TRTSDTM", "TRTEDTM"),                               gen_adeg_adtm,         list(study_duration = 2),
-  "ADY",                               c("ADTM", "TRTSDTM"),                                  gen_adeg_ady,          NULL
+
+    "ADY",                               c("ADTM", "TRTSDTM"),                                  gen_adeg_ady,          NULL
 )
+
+# ADSL <- gen_table_data(N = 10, recipe = adsl_recipe)
+# ADEG <- gen_reljoin_table(adeg_rel_join_recipe, adeg_table_recipe, db = list(ADSL = ADSL))
 
