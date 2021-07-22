@@ -34,7 +34,7 @@ join_paramcd_adeg <- function(n, .df, .dbtab) {
 
 #' Generate Sequence Per Number of USUBJID Observation
 #'
-#' @param n
+#' @param n not used
 #' @param .df data frame with required variable `USUBJID`
 #'
 #' @examples
@@ -58,21 +58,21 @@ gen_adeg_seq <- function(n, .df, ...) {
 
 #' Generate Analysis Timepoints
 #'
-#' @param n
-#' @param .df data frame
+#' @param n number of rows
+#' @param .df not used
 #'
 #' @examples
 #' x <- data.frame(A = 1:10)
-#' gen_adeg_atptn(NULL, x)
+#' gen_adeg_atptn(length(x), x)
 #'
 gen_adeg_atptn <- function(n, .df, ...) {
-  tibble(ATPTN = 1)
+  tibble(ATPTN = rep(1, n))
 }
 
 
 #' Generate Name & Description of Tests to Obtain EG Data
 #'
-#' @param n
+#' @param n not used
 #' @param .df data frame with required variables `PARAMCD` and `PARAM`
 #'
 #' @examples
@@ -125,7 +125,7 @@ dtype_depvars <- c("USUBJID", "PARAMCD", "BASETYPE", "ADTM", "ASPID", "EGSEQ", "
 
 #' Generate Derivation Types and Analysis Visits
 #'
-#' @param n
+#' @param n not used
 #' @param .df data frame with required variables `USUBJID`, `PARAMCD`, `BASETYPE`, `ADTM`, `ASPID`, `EGSEQ`, `AVISIT`, `ONTRTFL`, `TRTSDTM`, and `AVAL`
 #' @param minimum
 #' @param visit_format format of analysis visit
@@ -155,7 +155,7 @@ gen_adeg_avisit_dtype <- function(n, minimum = TRUE, .df, visit_format = "WEEK",
 
 #' Generate Sponsor Identifiers
 #'
-#' @param n
+#' @param n not used
 #' @param .df data frame with required variable `USUBJID`
 #'
 #' @examples
@@ -176,7 +176,7 @@ gen_adeg_aspid <- function(n, .df, ...) {
 
 #' Generate Analysis Values
 #'
-#' @param n
+#' @param n not used
 #' @param .df data frame with required variables `mean_aval` and `sd_aval`
 #'
 #' @examples
@@ -192,7 +192,7 @@ gen_adeg_aval <- function(n, .df, ...) {
 
 #' Generate Character Type Analysis Values
 #'
-#' @param n
+#' @param n not used
 #' @param .df data frame with required variables `PARAMCD` and `AVAL`
 #'
 #' @examples
@@ -210,7 +210,7 @@ gen_adeg_adesc <- function(n, .df, adesc = avaldescr_sel, ...) {
 
 #' Generate Analysis Reference Range Indicators
 #'
-#' @param n
+#' @param n not used
 #' @param .df data frame with required variables `AVAL`, `ANRLO`, and `ANRHI`
 #'
 #' @examples
@@ -229,7 +229,7 @@ gen_adeg_anrind <- function(n, .df, ...) {
 
 #' Generate Baseline Values and Types
 #'
-#' @param n
+#' @param n not used
 #' @param .df data frame with required variables `AVISITN`, `AVAL`, and `ABLFL`
 #'
 #' @examples
@@ -252,7 +252,7 @@ basec_depvars <- c("PARAMCD", "AVALC", "AVISIT", "BASE")
 
 #' Generate Character Type Baseline Values
 #'
-#' @param n
+#' @param n not used
 #' @param .df data frame with required variables `PARAMCD`, `AVALC`, `AVISIT`, and `BASE`
 #'
 # gen_adeg_bdesc <- function(n, .df, ...) {
@@ -266,23 +266,25 @@ basec_depvars <- c("PARAMCD", "AVALC", "AVISIT", "BASE")
 
 #' Generate Baseline Reference Range Indicators
 #'
-#' @param n
+#' @param n not used
 #' @param .df data frame with required variables `ANRIND` and `ABLFL`
 #'
+#' @examples
 #' aval <- gen_adeg_aval(NULL, lookup_adeg)
 #' anrind <- gen_adeg_anrind(NULL, data.frame(aval, lookup_adeg))
-#' gen_adeg_bnrind(NULL, data.frame(anrind, ...))
+#' ablfl <- gen_adeg_ablfl(NULL, data.frame(AVISIT = c("SCREENING", "BASELINE", "WEEK 1 DAY 8", "WEEK 2 DAY 15")))
+#' gen_adeg_bnrind(NULL, data.frame(anrind, ablfl))
 #'
-# gen_adeg_bnrind <- function(n, .df, ...) {
-#   tibble(BNRIND = factor(.df$ANRIND[.df$ABLFL == "Y"],
-#                          levels = c("LOW", "NORMAL", "HIGH"))
-#   )
-# }
+gen_adeg_bnrind <- function(n, .df, ...) {
+  tibble(BNRIND = factor(.df$ANRIND[.df$ABLFL == "Y"],
+                         levels = c("LOW", "NORMAL", "HIGH"))
+  )
+}
 
 
 #' Generate Change from Baseline Values
 #'
-#' @param n
+#' @param n not used
 #' @param .df data frame with required variables `AVISITN`, `AVAL`, and `BASE`
 #'
 # gen_adeg_chg <- function(n, .df, ...) {
@@ -292,7 +294,7 @@ basec_depvars <- c("PARAMCD", "AVALC", "AVISIT", "BASE")
 
 #' Generate Percent Change from Baseline Values
 #'
-#' @param n
+#' @param n not used
 #' @param .df data frame with required variables `AVISITN`, `CHG`, and `BASE`
 #'
 # gen_adeg_pchg <- function(n, .df, ...) {
@@ -305,7 +307,7 @@ basec_depvars <- c("PARAMCD", "AVALC", "AVISIT", "BASE")
 
 #' Generate Analysis Baseline Flags
 #'
-#' @param n
+#' @param n not used
 #' @param .df data frame with required variable `AVISIT`
 #' @param visit_format
 #'
@@ -323,7 +325,7 @@ gen_adeg_ablfl <- function(n, .df, visit_format = "WEEK", ...) {
 
 #' Generate Analysis Flags 01 Baseline Post-Baseline
 #'
-#' @param n
+#' @param n not used
 #' @param .df data frame with required variables `ABLFL`, `DTYPE`, `WORS01FL`, and `AVISIT`
 #'
 #' @examples
@@ -340,7 +342,7 @@ gen_adeg_anl01fl <- function(n, .df, ...) {
 
 #' Generate Analysis Flags 03 Min Obs Within BType
 #'
-#' @param n
+#' @param n not used
 #' @param .df data frame with required variables `ABLFL`, `DTYPE`, `PARAMCD`
 #'
 #' @examples
@@ -360,7 +362,7 @@ gen_adeg_anl03fl <- function(n, .df, ...) {
 
 #' Generate Analysis Flags 04 Max Obs Within BType
 #'
-#' @param n
+#' @param n not used
 #' @param .df data frame with required variables `ABLFL`, `DTYPE`, `PARAMCD`
 #'
 #' @examples
@@ -380,7 +382,7 @@ gen_adeg_anl04fl <- function(n, .df, ...) {
 
 #' Generate On Treatment Record Flags
 #'
-#' @param n
+#' @param n not used
 #' @param .df data frame with required variables `TRTSDTM`, `TRTEDTM`, `ADTM`
 #'
 #' @examples
@@ -403,7 +405,7 @@ gen_adeg_ontrtfl <- function(n, .df, ...) {
 
 #' Generate Analysis Visit Numbers
 #'
-#' @param n
+#' @param n not used
 #' @param .df data frame with required variables `AVISIT`
 #'
 #' @examples
@@ -473,7 +475,7 @@ wors_depvars <- c("USUBJID", "PARAMCD", "BASETYPE", "AVISIT", "ADTM", "ASPID", "
 
 #' Generate Worst Observation in Window Flags 01
 #'
-#' @param n
+#' @param n not used
 #' @param .df data frame with required variables `USUBJID`, `PARAMCD`, `BASETYPE`, `AVISIT`, `ADTM`, `ASPID`, `EGSEQ`, `AVISITN`, `ONTRTFL`, `TRTSDTM`, `DTYPE`, `AVALC`, and `AVAL`
 #'
 gen_adeg_wors01fl <- function(n, .df, ...) {
@@ -483,7 +485,7 @@ gen_adeg_wors01fl <- function(n, .df, ...) {
 
 #' Generate Worst Post-Baseline Observation Flags
 #'
-#' @param n
+#' @param n not used
 #' @param .df data frame with required variables `USUBJID`, `PARAMCD`, `BASETYPE`, `AVISIT`, `ADTM`, `ASPID`, `EGSEQ`, `AVISITN`, `ONTRTFL`, `TRTSDTM`, `DTYPE`, `AVALC`, and `AVAL`
 #'
 gen_adeg_wors02fl <- function(n, .df, ...) {
@@ -493,7 +495,7 @@ gen_adeg_wors02fl <- function(n, .df, ...) {
 
 #' Generate Analysis Datetime
 #'
-#' @param n
+#' @param n not used
 #' @param .df data frame with required variables `TRTSDTM` and `TRTEDTM`
 #'
 #' @examples
@@ -512,7 +514,7 @@ gen_adeg_adtm <- function(n, .df, study_duration = 2, ...) {
 
 #' Generate Analysis Relative Day
 #'
-#' @param n
+#' @param n not used
 #' @param .df data frame with required variables `TRTSDTM` and `TRTEDTM`
 #'
 #' @examples
@@ -562,4 +564,3 @@ adeg_table_recipe <- tribble(
 
 # ADSL <- gen_table_data(N = 10, recipe = adsl_recipe)
 # ADEG <- gen_reljoin_table(adeg_rel_join_recipe, adeg_table_recipe, db = list(ADSL = ADSL))
-
