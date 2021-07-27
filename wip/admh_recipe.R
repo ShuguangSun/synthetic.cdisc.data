@@ -3,10 +3,6 @@ admh_scaff <- rand_per_key("USUBJID", mincount = 0, maxcount = 10, prop_present 
 admh_sjrec <- tribble(~foreign_tbl, ~foreign_key, ~func,      ~func_args,
                       "ADSL",       "USUBJID",    admh_scaff, NULL)
 
-join_admh <- function(n, .df, .dbtab) {
-  merge(.dbtab, admh_lookup, by = "USUBJID")
-}
-
 admh_vars <- c("ASEQ",     "MHSEQ",    "MHTERM",   "MHDECOD",  "MHBODSYS", "MHSOC",
                "ASTDTM",   "AENDTM",   "ASTDY",    "AENDY")
 
@@ -25,13 +21,17 @@ admh_lookup <- tribble(~MHBODSYS, ~MHDECOD, ~MHSOC,
 
 secs_per_year <- 31556952
 
-#' Generate Analysis Start and End Dates
+#' Generate Analysis Start and End Datetimes
 #'
 #' @param n not used
 #' @param .df data frame with required variables `TRTSDTM` and `TRTEDTM`
 #'
+#' @examples
+#' dtms <- data.frame(TRTSDTM = "2018-04-01 14:03:04 EST", TRTEDTM = "2021-09-26 09:43:22 EST")
+#' gen_adcm_dtms(NULL, dtms)
+#'
 gen_ase_dtms <- function(n, .df, study_duration_secs = 2 * secs_per_year, ...) {
-  stopifnot(all(c("TRTSDTM", "TRTEDTM")) %in% names(.df))
+  stopifnot(all(c("TRTSDTM", "TRTEDTM") %in% names(.df)))
   sds <- study_duration_secs
   tstart <- .df$TRTSDTM
   tend <- .df$TRTEDTM
@@ -95,4 +95,3 @@ admh_recipe <- tribble(~variables,  ~dependencies, ~func,             ~func_args
                        "MHTERM",    "MHDECOD",     gen_admh_mhterm,   NULL,                                          TRUE
 )
 
-gen_reljoin_table(admh_sjrec, admh_recipe, db = list(ADSL = ADSL))
