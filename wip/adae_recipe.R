@@ -1,9 +1,9 @@
-adae_scaff <- rand_per_key("USUBJID", mincount = 0, maxcount = 10, prop_present = 1)
+ae_scaff <- rand_per_key("USUBJID", mincount = 0, maxcount = 10, prop_present = 1)
 
-adae_sjrec <- tribble(~foreign_tbl, ~foreign_key, ~func,      ~func_args,
-                      "ADSL",       "USUBJID",    adae_scaff, NULL)
+ae_sjrec <- tribble(~foreign_tbl, ~foreign_key, ~func,      ~func_args,
+                    "ADSL",       "USUBJID",    ae_scaff,   NULL)
 
-adae_lookup <- tribble(
+lookup_ae <- tribble(
     ~AEBODSYS, ~AELLT,          ~AEDECOD,        ~AEHLT,        ~AEHLGT,      ~AETOXGR, ~AESOC, ~AESER, ~AREL,
     "cl A.1",  "llt A.1.1.1.1", "dcd A.1.1.1.1", "hlt A.1.1.1", "hlgt A.1.1", "1",      "cl A", "N",    "N",
     "cl A.1",  "llt A.1.1.1.2", "dcd A.1.1.1.2", "hlt A.1.1.1", "hlgt A.1.1", "2",      "cl A", "Y",    "N",
@@ -17,10 +17,9 @@ adae_lookup <- tribble(
     "cl D.2",  "llt D.2.1.5.3", "dcd D.2.1.5.3", "hlt D.2.1.5", "hlgt D.2.1", "1",      "cl D", "N",    "Y"
 )
 
-secs_per_year <- 31556952
-
 #' Helper functions and constants for ADAE
 
+secs_per_year <- 31556952
 
 #' Generate Analysis Start and End Datetimes
 #'
@@ -30,9 +29,9 @@ secs_per_year <- 31556952
 #' @examples
 #' dtms <- data.frame(TRTSDTM = "2018-04-01 14:03:04 EST",
 #'                    TRTEDTM = "2021-09-26 09:43:22 EST")
-#' gen_adae_dtms(NULL, dtms)
+#' gen_ae_dtms(NULL, dtms)
 #'
-gen_adae_dtms <- function(n, .df, study_duration_secs = 2 * secs_per_year) {
+gen_ae_dtms <- function(n, .df, study_duration_secs = 2 * secs_per_year) {
   stopifnot(all(c("TRTSDTM", "TRTEDTM") %in% names(.df)))
   sds <- study_duration_secs
   tstart <- .df$TRTSDTM
@@ -51,9 +50,9 @@ gen_adae_dtms <- function(n, .df, study_duration_secs = 2 * secs_per_year) {
 #' @param .df data frame with required variables `AEDECOD`
 #'
 #' @examples
-#' gen_adae_aeterm(NULL, adae_lookup)
+#' gen_ae_aeterm(NULL, lookup_ae)
 #'
-gen_adae_aeterm <- function(n, .df) gsub("dcd", "trm", .df$AEDECOD, fixed = TRUE)
+gen_ae_aeterm <- function(n, .df) gsub("dcd", "trm", .df$AEDECOD, fixed = TRUE)
 
 
 #' Generate Severity/Intensity Levels
@@ -62,16 +61,15 @@ gen_adae_aeterm <- function(n, .df) gsub("dcd", "trm", .df$AEDECOD, fixed = TRUE
 #' @param .df data frame with required variables `AETOXGR`
 #'
 #' @examples
-#' gen_adae_aesev(NULL, adae_lookup)
+#' gen_ae_aesev(NULL, lookup_ae)
 #'
-gen_adae_aesev <- function(n, .df, ...) {
+gen_ae_aesev <- function(n, .df, ...) {
   stopifnot("AETOXGR" %in% names(.df))
   tibble(AESEV = case_when(.df$AETOXGR == 1 ~ "MILD",
                         .df$AETOXGR %in% c(2, 3) ~ "MODERATE",
                         .df$AETOXGR %in% c(4, 5) ~ "SEVERE"))
 }
 
-aeseqvars <- c("ASEQ", "AESEQ")
 
 #' Generate Sequence Per Number of USUBJID Observation
 #'
@@ -84,7 +82,7 @@ aeseqvars <- c("ASEQ", "AESEQ")
 #'
 #' aeseq_func(NULL, data.frame(USUBJID = c('id1', 'id1', 'id2', 'id3', 'id3', 'id3')))
 #'
-gen_adae_aeseq <- function(n, .df) {
+gen_ae_aeseq <- function(n, .df) {
   spl <- split(seq_along(.df$USUBJID), .df$USUBJID)
   rowgroups <- lapply(spl, function(spli) {
     data.frame(rownum = spli,
@@ -96,6 +94,7 @@ gen_adae_aeseq <- function(n, .df) {
   retdf[o, aeseqvars]
 }
 
+aeseqvars <- c("ASEQ", "AESEQ")
 dtmvars <- c("ASTDTM", "ASTDY", "AENDTM", "AENDY")
 dtmdeps <- c("TRTSDTM", "TRTEDTM")
 
@@ -105,9 +104,9 @@ dtmdeps <- c("TRTSDTM", "TRTEDTM")
 #' @rdname adae_recipes
 #' @export
 #'
-adae_recipe <- tribble(~variables, ~dependencies, ~func,            ~func_args,                                    ~keep,
-                       "AETERM",   "AEDECOD",     gen_adae_aeterm,  NULL,                                          TRUE,
-                       "AESERV",   "AETOXGR",     gen_adae_aesev,   NULL,                                          TRUE,
-                       dtmvars,    dtmdeps,       gen_adae_dtms,    list(study_duration_secs = 1 * secs_per_year), TRUE,
-                       aeseqvars,  "USUBJID",     gen_adae_aeseq,   NULL,                                          TRUE
-               )
+ae_recipe <- tribble(
+  ~variables, ~dependencies, ~func,            ~func_args,                                    ~keep,
+  "AETERM",   "AEDECOD",     gen_adae_aeterm,  NULL,                                          TRUE,
+  "AESERV",   "AETOXGR",     gen_adae_aesev,   NULL,                                          TRUE,
+  dtmvars,    dtmdeps,       gen_adae_dtms,    list(study_duration_secs = 1 * secs_per_year), TRUE,
+  aeseqvars,  "USUBJID",     gen_adae_aeseq,   NULL,                                          TRUE)
