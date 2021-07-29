@@ -24,6 +24,7 @@ jobs:
     steps:
       - name: Install basic system requirements
         run:  |
+           apt-get update
            apt install -y git r-base curl
         shell: bash
 
