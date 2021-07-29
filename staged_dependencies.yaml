@@ -7,5 +7,5 @@ upstream_repos:
   host: https://github.com
 
 current_repo:
-- repo: Roche/synthetic.cdisc.data
+  repo: Roche/synthetic.cdisc.data
   host: https://github.com
