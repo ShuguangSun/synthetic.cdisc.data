@@ -22,6 +22,11 @@ jobs:
           - {image: rocker/tidyverse, tag: '4.1.0'}
 
     steps:
+      - name: Install basic system requirements
+        run:  |
+           apt install -y git r-base curl
+        shell: bash
+
       - name: Check if Docker image meets requirements
         run: |
           lsb=$(lsb_release -d)
