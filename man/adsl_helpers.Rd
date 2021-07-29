@@ -114,6 +114,25 @@ usubj_deps
 
 usubj_vars
 }
+\arguments{
+\item{n}{Number of subjects}
+
+\item{study_duration}{Study duration (years)}
+
+\item{sys_dtm}{Study start}
+
+\item{discons}{Proportion of subjects discontinued}
+
+\item{.df}{Data frame}
+
+\item{x}{Sites to sample from}
+
+\item{prob}{Probability of selecting each site}
+
+\item{narms}{Number of arms}
+
+\item{armnms}{Arm names}
+}
 \description{
 Helper functions and constants for ADSL
 }
