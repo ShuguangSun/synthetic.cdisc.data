@@ -248,6 +248,11 @@ usubj_vars <- c("SITEID", "INVID", "USUBJID")
 
 #' Recipe for the ADSL dataset
 #'
+#' Subject Level Dataset
+#'
+#' @details This particular recipe implements a simple generic ADSL dataset.
+#'
+#'
 #' @export
 #' @rdname cdisc_recs
 #'
