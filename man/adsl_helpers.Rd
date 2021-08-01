@@ -22,6 +22,10 @@
 \alias{sample_siteid}
 \alias{arm_varnames}
 \alias{sample_armcd}
+\alias{lup_dcreas}
+\alias{lup_dthother}
+\alias{dthvarclasses}
+\alias{dth_varnames}
 \alias{usubj_deps}
 \alias{usubj_vars}
 \title{Helper functions and constants for ADSL}
@@ -55,6 +59,14 @@ An object of class \code{character} of length 4.
 An object of class \code{character} of length 6.
 
 An object of class \code{character} of length 4.
+
+An object of class \code{data.frame} with 7 rows and 2 columns.
+
+An object of class \code{data.frame} with 5 rows and 2 columns.
+
+An object of class \code{character} of length 7.
+
+An object of class \code{character} of length 7.
 
 An object of class \code{character} of length 3.
 
@@ -109,6 +121,14 @@ sample_armcd(
   narms = 3,
   armnms = c(`ARM A` = "A: Drug X", `ARM B` = "B: Placebo", `ARM C` = "C: Combination")
 )
+
+lup_dcreas
+
+lup_dthother
+
+dthvarclasses
+
+dth_varnames
 
 usubj_deps
 

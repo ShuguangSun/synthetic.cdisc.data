@@ -20,7 +20,8 @@ s_tte_param <- c("OS" = "Overall Survival",
                  "PFS" = "Progression Free Survival",
                  "Event Free Survival")
 
-join_paramcd_tte <- function(n, .df, .dbtab) {
+join_paramcd_tte <- function(n, .df, .db) {
+    .dbtab <- .db[["ADSL"]]
     merge(.dbtab, lookup_tte, by = "ARMCD", by.y = "ARM", all = TRUE)
 }
 

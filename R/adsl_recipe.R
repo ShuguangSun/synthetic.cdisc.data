@@ -94,7 +94,7 @@ sample_trtdtmvars<- function(n, study_duration = 2,
 
 #' @rdname adsl_helpers
 #' @export
-eos_varnames <- c("EOSDT", "EOSDY", "EOSSTT", "DSCREAS")
+eos_varnames <- c("EOSDT", "EOSDY", "EOSSTT", "DCSREAS")
 #' @rdname adsl_helpers
 #' @export
 s_discon <-  c("ADVERSE EVENT",
@@ -121,7 +121,7 @@ make_eosvars <- function(.df, n = NROW(.df)) {
     data.frame(EOSDT = eosdt,
                EOSDY = eosdy,
                EOSSTT = eosstt,
-               DSCREAS = dcreas,
+               DCSREAS = dcreas,
                stringsAsFactors = FALSE)
 }
 
@@ -146,6 +146,93 @@ sample_armcd <- function(n, narms = 3, armnms = c("ARM A" = "A: Drug X", "ARM B"
     data.frame(ARM = arm, ARMCD = armcd, ACTARM = arm, ACTARMCD = armcd)
 }
 
+
+#' @rdname adsl_helpers
+#' @export
+lup_dcreas <- data.frame(stringsAsFactors = FALSE,
+    choices = c(
+      "ADVERSE EVENT", "DEATH", "LACK OF EFFICACY", "PHYSICIAN DECISION",
+      "PROTOCOL VIOLATION", "WITHDRAWAL BY PARENT/GUARDIAN", "WITHDRAWAL BY SUBJECT"
+    ),
+    prob = c(.2, 1, .1, .1, .2, .1, .1)
+)
+
+#' @rdname adsl_helpers
+#' @export
+lup_dthother <- data.frame(stringsAsFactors = FALSE,
+                      choices = c(
+                          "Post-study reporting of death",
+                          "LOST TO FOLLOW UP",
+                          "MISSING",
+                          "SUICIDE",
+                          "UNKNOWN"
+                      ),
+                      prob = c(.1, .3, .3, .2, .1)
+)
+
+
+
+## #' @rdname adsl_helpers
+## #' @export
+## adsl_gen_dcsreas <- function(n, .df, dcreas_lup) {
+##     .df$DCSREAS <- NA_character_
+##     inds <- which(.df$EOSSTT == "DISCONTINUED")
+##     .df$DCSREAS[inds] <- sample(dcreas_lup$choices,
+##                                 length(inds),
+##                                 replace = TRUE,
+##                                 prob = dcreas_lup$prop)
+##     .df[, "DCSREAS", drop = TRUE]
+## }
+
+
+#' @rdname adsl_helpers
+#' @export
+dthvarclasses <- c(DTHFL = NA_character_,
+                   DTHCAT = NA_character_,
+                   DTHCAUS = NA_character_,
+                   LDDTHELD = "integer",
+                   LDDTHGR1 = NA_character_,
+                   DTHDT = NA_character_,
+                   LSTALVDT = NA_character_)
+#' @rdname adsl_helpers
+#' @export
+dth_varnames <- names(dthvarclasses)
+dth_deps <- c("DCSREAS", "TRTEDTM")
+
+adsl_gen_dthvars <- function(n = NROW(.df), .df, dth_lup) {
+    ret <- init_new_cols(n, colnames = head(dth_varnames, 5),
+                         colclasses = head(dthvarclasses, 5)) ## dates currently not supported
+
+    ret$DTHFL <- ifelse(is.na(.df$DCSREAS) | .df$DCSREAS != "DEATH", "N", "Y")
+    inds <- which(ret$DTHFL == "Y")
+    ret$DTHCAT[inds] <- sample(c("ADVERSE EVENT", "PROGRESSIVE DISEASE", "OTHER"),
+                               replace = TRUE,
+                               size = length(inds))
+    ret$DTHCAUS[inds] <- ret$DTHCAT[inds]
+    othinds <- which(ret$DTHCAT == "OTHER")
+    ret$DTHCAUS[othinds] <- sample(dth_lup$choices,
+                                   length(othinds),
+                                   replace = TRUE,
+                                   prob = dth_lup$prob)
+
+
+    ret$LDDTHELD[inds] <- sample(0:50, length(inds), replace = TRUE)
+    ret$LDDTHGR1[inds] <- ifelse(ret$LDDTHELD[inds] <= 30, "<=30", ">30")
+    ## NAs handled by addition here
+    ret$DTHDT <-  .df$TRTEDTM + ret$LDDTHELD*secs_per_day
+    ret$LSTALVDT <- ret$DTHDT
+    ret$LSTALVDT[-inds] <- rand_posixct(as.POSIXct(.df$TRTEDTM[-inds] + 10 * secs_per_day),
+                                        as.POSIXct(.df$TRTEDTM[-inds] + 30 * secs_per_day))
+    ret
+}
+
+
+
+
+
+
+
+
 #' @rdname adsl_helpers
 #' @export
 usubj_deps <- c("STUDYID", "COUNTRY", "SUBJID")
@@ -155,17 +242,22 @@ usubj_vars <- c("SITEID", "INVID", "USUBJID")
 
 
 
+
+
+
+
 #' Recipe for the ADSL dataset
 #'
 #' @export
+#' @rdname cdisc_recs
 #'
 #' @examples
 #'
 #' adsl_recipe
 #'
-#' gen_table_data(adsl_recipe)
+#' adsl <- gen_table_data(N = 10, adsl_recipe)
 #'
-adsl_recipe <- tribble(
+adsl_tbl_recipe <- tribble(
   ~variables,       ~dependencies,   ~func,                  ~func_args,
   "STUDYID",        no_deps,          rep_n,                 list(val = "AB12345"),
   "COUNTRY",        no_deps,          sample_fct,            list(x = s_countries, prob = country_site_prob),
@@ -182,5 +274,8 @@ adsl_recipe <- tribble(
   "BMEASIFL",       no_deps,          sample_yn,             NULL,
   "BEP01FL",        no_deps,          sample_yn,             NULL,
   trtdtm_varnames,  no_deps,          sample_trtdtmvars,     NULL,
-  eos_varnames,     trtdtm_varnames,  make_eosvars,          NULL
+  eos_varnames,     trtdtm_varnames,  make_eosvars,          NULL,
+#  "DCSREAS",        "EOSSTT",         adsl_gen_dcsreas,       list(dcreas_lup = lup_dcreas),
+  dth_varnames,     dth_deps,         adsl_gen_dthvars,      list(dth_lup = lup_dthother)
+
 )
