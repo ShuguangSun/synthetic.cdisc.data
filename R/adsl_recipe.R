@@ -281,6 +281,7 @@ adsl_tbl_recipe <- tribble(
   trtdtm_varnames,  no_deps,          sample_trtdtmvars,     NULL,
   eos_varnames,     trtdtm_varnames,  make_eosvars,          NULL,
 #  "DCSREAS",        "EOSSTT",         adsl_gen_dcsreas,       list(dcreas_lup = lup_dcreas),
-  dth_varnames,     dth_deps,         adsl_gen_dthvars,      list(dth_lup = lup_dthother)
+  dth_varnames,     dth_deps,         adsl_gen_dthvars,      list(dth_lup = lup_dthother),
+  "study_duration_secs", no_deps, function(n, study_duration) study_duration*secs_per_year, list(study_duration = 2)
 
 )

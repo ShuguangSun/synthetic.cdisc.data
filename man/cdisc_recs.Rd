@@ -32,7 +32,10 @@ adaette_tbl_recipe
 adsl_tbl_recipe
 }
 \description{
-Recipe for the ADSL dataset
+Subject Level Dataset
+}
+\details{
+This particular recipe implements a simple generic ADSL dataset.
 }
 \examples{
 

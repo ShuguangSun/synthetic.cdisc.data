@@ -51,7 +51,7 @@ adaette_one_pat <- function(pat_info, s_dur_secs = pat_info$study_duration_secs)
 
     if(is.na(trtedtm))
         trtedtm <- trtsdtm + s_dur_secs
-    compl <- !is.na(eosdt) && eosdt < trtedtm
+    compl <- (!is.na(eosdt) && !is.na(trtedtm)) && eosdt < trtedtm
 
     adtm <- if(compl) eosdt else trtedtm
     ady <- as.double(adtm - trtsdtm, units = "days") + 1

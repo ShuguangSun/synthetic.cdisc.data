@@ -57,7 +57,7 @@ gen_tte_descs <- function(n, .df, edesc = evntdescr_sel, cnsdesc = cnsdtdscr_sel
 #'
 #' @rdname adtte_recipes
 #' @export
-tte_rel_join_recipe <- tribble(
+tte_scaff_recipe <- tribble(
     ~foreign_tbl, ~foreign_key, ~foreign_deps, ~variables, ~dependencies, ~func, ~func_args,
     "ADSL", "USUBJID", "ARMCD", c("PARAMCD", "PARAM", "LAMBDA", "CNSR_P"), no_deps, join_paramcd_tte, NULL)
 
@@ -70,7 +70,7 @@ tte_rel_join_recipe <- tribble(
 #' ADSL <- gen_table_data(N = 10, recipe = adsl_recipe)
 #' gen_reljoin_table(tte_rel_join_recipe, tte_table_recipe, db = list(ADSL = ADSL))
 #'
-tte_table_recipe <- tribble(
+tte_tbl_recipe <- tribble(
     ~variables, ~dependencies, ~func, ~func_args,
     "CNSR", "CNSR_P", gen_tte_cnsr, NULL,
     c("AVAL", "AVALU"), "LAMBDA", gen_tte_aval, NULL,
