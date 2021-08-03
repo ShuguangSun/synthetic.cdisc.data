@@ -19,3 +19,5 @@
 (^|/)[#][^/]*#$
 ~$
 ^wip$
+^.github$
+^staged_dependencies.yaml$

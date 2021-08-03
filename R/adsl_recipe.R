@@ -68,6 +68,10 @@ s_bmrkr2 <- c("LOW", "MEDIUM", "HIGH")
 trtdtm_varnames <- c("TRTSDTM", "RANDDT", "TRTEDTM")
 
 #' @rdname adsl_helpers
+#' @param n Number of subjects
+#' @param study_duration Study duration (years)
+#' @param sys_dtm Study start
+#' @param discons Proportion of subjects discontinued
 #' @export
 sample_trtdtmvars<- function(n, study_duration = 2,
                            sys_dtm = as.numeric(strptime("20/2/2019 11:16:16.683", "%d/%m/%Y %H:%M:%OS")),
@@ -126,6 +130,9 @@ make_eosvars <- function(.df, n = NROW(.df)) {
 }
 
 #' @rdname adsl_helpers
+#' @param .df Data frame
+#' @param x Sites to sample from
+#' @param prob Probability of selecting each site
 #' @export
 sample_siteid <- function(.df, n, x, prob) {
     raw <- sample_fct(x = x, prob = prob, n = n)
@@ -139,6 +146,8 @@ sample_siteid <- function(.df, n, x, prob) {
 #' @export
 arm_varnames <- c("ARM", "ARMCD", "ACTARM", "ACTARMCD")
 #' @rdname adsl_helpers
+#' @param narms Number of arms
+#' @param armnms Arm names
 #' @export
 sample_armcd <- function(n, narms = 3, armnms = c("ARM A" = "A: Drug X", "ARM B" = "B: Placebo", "ARM C" = "C: Combination") ) {
     armcd <- sample_fct(paste("ARM", LETTERS[1:narms]), n = n)
