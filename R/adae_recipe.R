@@ -1,12 +1,14 @@
 
 #' ADAE recipe helper functions and constants
 #' @rdname adae_helpers
+#' @inheritParams gen_args
 #' @aliases adae, ADAE
 #' @export
 adae_sjf <- rand_per_key("USUBJID", tblnm = "ADSL", mincount = 0, maxcount = 10,
                           prop_present = 1)
 
 #' @rdname cdisc_recs
+#' @inheritParams gen_args
 #' @export
 adae_scaff_recipe <- tribble(~foreign_tbls, ~foreign_key, ~func, ~func_args,
                       "ADSL", "USUBJID", adae_sjf, NULL)
@@ -59,7 +61,8 @@ dtmdeps <- c("TRTEDTM", "TRTSDTM")
 #' Add Random date and day columns
 #'
 #' This function generates random values for the \code{ASTDM} \code{AENDTM} \code{ASTDY} and \code{AENDY} columns and returns a data.frame containing those columns.
-#' @param df data.frame
+#' @inheritParams gen_args
+#' @param study_duration_secs numeric(1). Study duration in seconds
 #' @export
 gen_ase_vars <- function(n, .df, study_duration_secs = 2*secs_per_year) {
     sds <- .df$study_duration_secs[1]

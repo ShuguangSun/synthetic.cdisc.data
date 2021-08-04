@@ -1,20 +1,29 @@
+## TODO remove some of these if they are ever not needed (and they
+## should some day be not needed!)
 
+#' @import tibble
+#' @import dplyr
+#' @importFrom stats quantile rchisq rexp rnorm runif
+#' @importFrom utils head
+#' @import respectables
+NULL
 
 #' Create visit schedule
 #'
-#' Create a visit schedule as factor.
+#' @description Create a visit schedule as factor.
 #'
 #' X number of visits or X number of cycles and Y number of days.
 #'
 #' @param visit_format as character string. Valid values: WEEK, CYCLE.
 #' @param n_assessments number of assessments. Valid values: integer.
 #' @param n_days number of days for each cycle: Valid values: integer.
+#' @param add_min_max logical(1). Should the min/max post-baseline values be added.
 #'
 #' @return a factor of length n_assessments
-#'
+#' @export
 #' @examples
-#' random.cdisc.data:::visit_schedule(visit_format = "WEeK", n_assessments = 10L)
-#' random.cdisc.data:::visit_schedule(visit_format = "CyCLE", n_assessments = 5L, n_days = 2L)
+#' visit_schedule(visit_format = "WEeK", n_assessments = 10L)
+#' visit_schedule(visit_format = "CyCLE", n_assessments = 5L, n_days = 2L)
 visit_schedule <- function(visit_format = "WEEK",
                            n_assessments = 10L,
                            n_days = 5L,
@@ -50,7 +59,8 @@ visit_schedule <- function(visit_format = "WEEK",
 
 #' Helper functions and constants for ADEG CDISC data recipe
 #' @export
-#' @rdname adeg_helpers.Rd
+#' @inheritParams gen_args
+#' @rdname adeg_helpers
 lookup_adeg <- tribble(
   ~PARAMCD,     ~PARAM,                ~PARAMU,      ~EGCAT,         ~mean_aval, ~sd_aval, ~ANRLO,   ~ANRHI,
   "QT",         "QT Duration",         "msec",       "INTERVAL",     350,        100,      200,      500,
@@ -60,29 +70,32 @@ lookup_adeg <- tribble(
 )
 
 #' @export
-#' @rdname adeg_helpers.Rd
+#' @rdname adeg_helpers
 adeg_varnames <- c("ASEQ", "EGSEQ", "EGTESTCD", "EGTEST", "EGCAT",   "ASPID",   "PARAM",    "PARAMCD",  "AVAL",    "AVALC",   "AVALU",
                    "BASE", "BASEC", "BASETYPE", "ABLFL",  "CHG",     "PCHG",    "DTYPE",    "ANRLO",    "ANRHI",   "ANRIND",  "BNRIND",
                    "ADTM", "ADY",   "ATPTN",    "AVISIT", "AVISITN", "ONTRTFL", "WORS01FL", "WORS02FL", "ANL01FL", "ANL03FL", "ANL04FL")
 
 #' @export
-#' @rdname adeg_helpers.Rd
+#' @rdname adeg_helpers
 s_adeg_paramcd <- c("QT", "RR", "HR", "ECGINTP")
 
 #' @export
-#' @rdname adeg_helpers.Rd
+#' @rdname adeg_helpers
 s_adeg_param <- c("QT" = "QT Duration",
                   "RR" = "RR Duration",
                   "HR" = "Heart Rate",
                   "ECGINTP" = "ECG Interpretation")
 
 #' @export
-#' @rdname adeg_helpers.Rd
+#' @rdname adeg_helpers
 s_adeg_paramu <-  c("msec", "msec", "beats/min", "")
 
 
 #' @export
-#' @rdname adeg_helpers.Rd
+#' @param visit_format character(1). Format of visit timing
+#' @param n_assess numeric(1). Number of assessments.
+#' @param n_days numeric(1). Number of days.
+#' @rdname adeg_helpers
 join_paramcd_adeg <- function(n, .df, .db, visit_format = "WEEK", n_assess = 10, n_days = 5) {
     .dbtab <- .db[["ADSL"]]
     dfout <- expand.grid( #nolint
@@ -104,7 +117,7 @@ join_paramcd_adeg <- function(n, .df, .db, visit_format = "WEEK", n_assess = 10,
 
 
 #' @export
-#' @rdname adeg_helpers.Rd
+#' @rdname adeg_helpers
 avaldescr_sel <- c("ABNORMAL","NORMAL")
 
 
@@ -112,7 +125,8 @@ avaldescr_sel <- c("ABNORMAL","NORMAL")
 #'
 #' @param n ignored.
 #' @param .df data frame with required variable `USUBJID`
-#'
+#' @export
+#' @rdname adeg_helpers
 #' @examples
 #' x <- data.frame(USUBJID = rep(1:10, each = 2))
 #'
@@ -133,13 +147,13 @@ gen_adeg_seq <- function(n, .df, ...) {
 
 
 #' @export
-#' @rdname adeg_helpers.Rd
+#' @rdname adeg_helpers
 gen_adeg_atptn <- function(n, .df, ...) {
   tibble(ATPTN = 1)
 }
 
 #' @export
-#' @rdname adeg_helpers.Rd
+#' @rdname adeg_helpers
 gen_adeg_eg <- function(n, .df, ...) {
   tibble(EGTESTCD = .df$PARAMCD,
          EGTEST = .df$PARAM
@@ -147,7 +161,7 @@ gen_adeg_eg <- function(n, .df, ...) {
 }
 
 ## #' @export
-## #' @rdname adeg_helpers.Rd
+## #' @rdname adeg_helpers
 ## gen_adeg_u <- function(n, .df, ...) {
 ##   tibble(USUBJID = .df$USUBJID
 ##   )
@@ -156,13 +170,13 @@ gen_adeg_eg <- function(n, .df, ...) {
 
 
 #' @export
-#' @rdname adeg_helpers.Rd
+#' @rdname adeg_helpers
 gen_adeg_aspid <- function(n, .df, ...) {
   tibble(ASPID = sample(1:n))
 }
 
 #' @export
-#' @rdname adeg_helpers.Rd
+#' @rdname adeg_helpers
 gen_adeg_aval <- function(n, .df, ...) {
   tibble(AVAL = rnorm(nrow(.df), mean = .df$mean_aval, sd = .df$sd_aval)/365.25,
          AVALU = "YEARS"
@@ -180,10 +194,10 @@ gen_adeg_aval <- function(n, .df, ...) {
 #' @param event flag to trigger the retain.
 #' @param outside value to.
 #'
-#' @examples
-#' ADLB <- radlb(radsl(N = 10, na_percentage = 0), na_vars = list())
-#' ADLB$BASE2 <- random.cdisc.data:::retain(df = ADLB, value_var = ADLB$AVAL,
-#'   event = ADLB$ABLFL2 == "Y")
+## #' @examples
+## ' ADLB <- radlb(radsl(N = 10, na_percentage = 0), na_vars = list())
+## ' ADLB$BASE2 <- random.cdisc.data:::retain(df = ADLB, value_var = ADLB$AVAL,
+## '   event = ADLB$ABLFL2 == "Y")
 retain <- function(df, value_var, event, outside = NA) {
   indices <- c(1, which(event == TRUE), nrow(df) + 1)
   values <- c(outside, value_var[event == TRUE])
@@ -193,7 +207,7 @@ retain <- function(df, value_var, event, outside = NA) {
 
 
 #' @export
-#' @rdname adeg_helpers.Rd
+#' @rdname adeg_helpers
 gen_adeg_base <- function(n, .df, ...) {
   tibble(BASE = ifelse(.df$AVISITN >= 0,
                        retain(.df, .df$AVAL, .df$ABLFL == "Y"),
@@ -203,7 +217,9 @@ gen_adeg_base <- function(n, .df, ...) {
 }
 
 #' @export
-#' @rdname adeg_helpers.Rd
+#' @param adesc character. ADESC values to sample from
+#' @param ... unused.
+#' @rdname adeg_helpers
 gen_adeg_adesc <- function(n, .df, adesc = avaldescr_sel, ...) {
   n <- NROW(.df)
   tibble(AVALC = ifelse(.df$PARAMCD == "ECGINTP",
@@ -214,14 +230,14 @@ gen_adeg_adesc <- function(n, .df, adesc = avaldescr_sel, ...) {
 
 
 #' @export
-#' @rdname adeg_helpers.Rd
+#' @rdname adeg_helpers
 basec_deps <- c("USUBJID", "PARAMCD", "BASETYPE", "AVALC", "AVISIT", "BASE", "ANRIND", "ABLFL")
 #' @export
-#' @rdname adeg_helpers.Rd
+#' @rdname adeg_helpers
 basec_vars <- c("BASEC", "BNRIND")
 
 #' @export
-#' @rdname adeg_helpers.Rd
+#' @rdname adeg_helpers
 gen_adeg_basec <- function(n, .df, ...) {
 
     .df$row_ord <- 1:NROW(.df)
@@ -240,21 +256,21 @@ gen_adeg_basec <- function(n, .df, ...) {
 }
 
 #' @export
-#' @rdname adeg_helpers.Rd
+#' @rdname adeg_helpers
 gen_adeg_chg <- function(n, .df, ...) {
   tibble(CHG = ifelse(.df$AVISITN > 0, .df$AVAL - .df$BASE, NA)
   )
 }
 
 #' @export
-#' @rdname adeg_helpers.Rd
+#' @rdname adeg_helpers
 gen_adeg_pchg <- function(n, .df, ...) {
   tibble(PCHG = ifelse(.df$AVISITN > 0, 100 * (.df$CHG / .df$BASE), NA)
   )
 }
 
 #' @export
-#' @rdname adeg_helpers.Rd
+#' @rdname adeg_helpers
 gen_adeg_anrind <- function(n, .df, ...) {
   tibble(ANRIND = factor(case_when(
     .df$AVAL < .df$ANRLO ~ "LOW",
@@ -265,13 +281,13 @@ gen_adeg_anrind <- function(n, .df, ...) {
 }
 
 #' @export
-#' @rdname adeg_helpers.Rd
+#' @rdname adeg_helpers
 gen_adeg_ablfl <- function(n, .df, ...) {
     ifelse(.df$AVISIT %in% c("BASELINE", "CYCLE 1 DAY 1"), "Y", "")
 }
 
 ## #' @export
-## #' @rdname adeg_helpers.Rd
+## #' @rdname adeg_helpers
 ## gen_adeg_anl01fl <- function(n, .df, ...) {
 ##     factor(ifelse(
 ##     (.df$ABLFL == "Y" |  (is.na(.df$DTYPE) & .df$WORS01FL == "Y"))
@@ -282,7 +298,7 @@ gen_adeg_ablfl <- function(n, .df, ...) {
 ## }
 
 ## #' @export
-## #' @rdname adeg_helpers.Rd
+## #' @rdname adeg_helpers
 ## gen_adeg_anl03fl <- function(n, .df, ...) {
 ##   tibble(ANL03FL = case_when(
 ##     .df$DTYPE == "MINIMUM" ~ "Y",
@@ -292,7 +308,7 @@ gen_adeg_ablfl <- function(n, .df, ...) {
 ## }
 
 ## #' @export
-## #' @rdname adeg_helpers.Rd
+## #' @rdname adeg_helpers
 ## gen_adeg_anl04fl <- function(n, .df, ...) {
 ##   tibble(ANL04FL = case_when(
 ##     .df$DTYPE == "MAXIMUM" ~ "Y",
@@ -302,7 +318,7 @@ gen_adeg_ablfl <- function(n, .df, ...) {
 ## }
 
 #' @export
-#' @rdname adeg_helpers.Rd
+#' @rdname adeg_helpers
 gen_adeg_onfl <- function(n, .df, ...) {
   tibble(ONTRTFL = factor(case_when(
     is.na(.df$TRTSDTM) ~ "",
@@ -314,7 +330,7 @@ gen_adeg_onfl <- function(n, .df, ...) {
 }
 
 #' @export
-#' @rdname adeg_helpers.Rd
+#' @rdname adeg_helpers
 gen_adeg_avisitn <- function(n, .df, ...) {
   tibble(AVISITN = case_when(
     .df$AVISIT == "SCREENING" ~ -1,
@@ -327,7 +343,9 @@ gen_adeg_avisitn <- function(n, .df, ...) {
 
 
 #' @export
-#' @rdname adeg_helpers.Rd
+#' @param data internal detail.
+#' @param worst_obs internal detail.
+#' @rdname adeg_helpers
 flag_variables_raw <- function(data, worst_obs) {
 
     data_compare <- data %>% # nolint
@@ -383,14 +401,14 @@ flag_variables_raw <- function(data, worst_obs) {
 }
 
 #' @export
-#' @rdname adeg_helpers.Rd
+#' @rdname adeg_helpers
 adeg_worsvars <- c("WORS01FL", "WORS02FL")
 #' @export
-#' @rdname adeg_helpers.Rd
+#' @rdname adeg_helpers
 adeg_worsvar_deps <- c("USUBJID", "PARAMCD", "BASETYPE", "AVISITN", "ONTRTFL",
                        "ADTM", "TRTSDTM", "DTYPE", "AVAL", "AVALC")
 #' @export
-#' @rdname adeg_helpers.Rd
+#' @rdname adeg_helpers
 gen_adeg_worsfl <- function(n, .df, ...) {
     .df <- flag_variables_raw(.df, FALSE)
     .df <- flag_variables_raw(.df, TRUE)
@@ -411,7 +429,8 @@ gen_adeg_worsfl <- function(n, .df, ...) {
 secs_per_year <- 31557600
 
 #' @export
-#' @rdname adeg_helpers.Rd
+#' @param study_duration numeric(1). study duration in years.
+#' @rdname adeg_helpers
 gen_adeg_adtm <- function(n, .df, study_duration = 2, ...) {
     study_duration_secs <- secs_per_year * study_duration
     strt <- .df$TRTSDTM
@@ -420,21 +439,21 @@ gen_adeg_adtm <- function(n, .df, study_duration = 2, ...) {
 }
 
 #' @export
-#' @rdname adeg_helpers.Rd
+#' @rdname adeg_helpers
 gen_adeg_ady <- function(n, .df, ...) {
   tibble(ADY = ceiling(as.numeric(difftime(.df$ADTM, .df$TRTSDTM, units = "days"))))
 }
 
 
 #' @export
-#' @rdname adeg_helpers.Rd
+#' @rdname adeg_helpers
 anlflagvars <- c("ANL01FL", "ANL03FL", "ANL04FL")
 #' @export
-#' @rdname adeg_helpers.Rd
+#' @rdname adeg_helpers
 anlflagdeps <- c("PARAMCD", "AVISIT",  "DTYPE", "ABLFL", "WORS01FL")
 
 #' @export
-#' @rdname adeg_helpers.Rd
+#' @rdname adeg_helpers
 gen_adeg_anlfls <- function(n, .df, ...) {
 
     .df$ANL01FL <- ""
@@ -459,18 +478,18 @@ gen_adeg_anlfls <- function(n, .df, ...) {
 
 #' Recipes for creating ADEG CDISC Data
 #'
-#' @rdname adeg_recipes
+#' @rdname cdisc_recs
 #' @export
 #'
 
 adae_scaff <- rand_per_key("USUBJID", tblnm = "ADSL", mincount = 0, maxcount = 10, prop_present = 1)
 
-#' @rdname adeg_recipes
+#' @rdname cdisc_recs
 #' @export
 adeg_scaff_recipe <- tribble(
   ~foreign_tbl, ~foreign_key, ~foreign_deps, ~variables, ~dependencies, ~func, ~func_args,
   "ADSL", "USUBJID", "PARAMCD", c("PARAM", "PARAMU", "mean_aval", "sd_aval", "ANRLO", "ANRHI"), no_deps, join_paramcd_adeg, NULL) ##adae_scaff, NULL)
-#' @rdname adeg_recipes
+#' @rdname cdisc_recs
 #' @export
 adeg_tbl_recipe <- tribble(
   ~variables,                          ~dependencies,                                         ~func,                 ~func_args,

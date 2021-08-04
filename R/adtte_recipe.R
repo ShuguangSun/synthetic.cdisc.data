@@ -53,22 +53,16 @@ gen_tte_descs <- function(n, .df, edesc = evntdescr_sel, cnsdesc = cnsdtdscr_sel
            CNSTDESC = ifelse(.df$CNSR, sample(cnsdesc, n, replace = TRUE), ""))
 }
 
-#' Recipes for creating ADTTE CDISC Data
-#'
-#' @rdname adtte_recipes
+
+#' @rdname cdisc_recs
 #' @export
 tte_scaff_recipe <- tribble(
     ~foreign_tbl, ~foreign_key, ~foreign_deps, ~variables, ~dependencies, ~func, ~func_args,
     "ADSL", "USUBJID", "ARMCD", c("PARAMCD", "PARAM", "LAMBDA", "CNSR_P"), no_deps, join_paramcd_tte, NULL)
 
-#' @rdname adtte_recipes
+#' @rdname cdisc_recs
 #'
 #' @export
-#'
-#' @examples
-#'
-#' ADSL <- gen_table_data(N = 10, recipe = adsl_recipe)
-#' gen_reljoin_table(tte_rel_join_recipe, tte_table_recipe, db = list(ADSL = ADSL))
 #'
 tte_tbl_recipe <- tribble(
     ~variables, ~dependencies, ~func, ~func_args,

@@ -17,17 +17,18 @@ visit_schedule(
 \item{n_assessments}{number of assessments. Valid values: integer.}
 
 \item{n_days}{number of days for each cycle: Valid values: integer.}
+
+\item{add_min_max}{logical(1). Should the min/max post-baseline values be added.}
 }
 \value{
 a factor of length n_assessments
 }
 \description{
 Create a visit schedule as factor.
-}
-\details{
+
 X number of visits or X number of cycles and Y number of days.
 }
 \examples{
-random.cdisc.data:::visit_schedule(visit_format = "WEeK", n_assessments = 10L)
-random.cdisc.data:::visit_schedule(visit_format = "CyCLE", n_assessments = 5L, n_days = 2L)
+visit_schedule(visit_format = "WEeK", n_assessments = 10L)
+visit_schedule(visit_format = "CyCLE", n_assessments = 5L, n_days = 2L)
 }

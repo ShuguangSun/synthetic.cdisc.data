@@ -9,6 +9,7 @@
 \alias{s_adeg_paramu}
 \alias{join_paramcd_adeg}
 \alias{avaldescr_sel}
+\alias{gen_adeg_seq}
 \alias{gen_adeg_atptn}
 \alias{gen_adeg_eg}
 \alias{gen_adeg_aspid}
@@ -81,6 +82,8 @@ join_paramcd_adeg(
 
 avaldescr_sel
 
+gen_adeg_seq(n, .df, ...)
+
 gen_adeg_atptn(n, .df, ...)
 
 gen_adeg_eg(n, .df, ...)
@@ -129,7 +132,39 @@ anlflagdeps
 
 gen_adeg_anlfls(n, .df, ...)
 }
+\arguments{
+\item{n}{ignored.}
+
+\item{.df}{data frame with required variable `USUBJID`}
+
+\item{.db}{list. Named list of data.frames for use in function when scaffolding}
+
+\item{visit_format}{character(1). Format of visit timing}
+
+\item{n_assess}{numeric(1). Number of assessments.}
+
+\item{n_days}{numeric(1). Number of days.}
+
+\item{...}{unused.}
+
+\item{adesc}{character. ADESC values to sample from}
+
+\item{data}{internal detail.}
+
+\item{worst_obs}{internal detail.}
+
+\item{study_duration}{numeric(1). study duration in years.}
+}
 \description{
 Helper functions and constants for ADEG CDISC data recipe
+
+Generate Sequence Per Number of USUBJID Observation
+}
+\examples{
+x <- data.frame(USUBJID = rep(1:10, each = 2))
+
+gen_adeg_seq(NULL, x)
+gen_adeg_seq(NULL, data.frame(USUBJID = c('id1', 'id1', 'id2', 'id3', 'id3', 'id3')))
+
 }
 \keyword{datasets}

@@ -12,6 +12,12 @@ adae_sjf(n, .db, .df)
 aes_func(n, .df, lookup = adae_lookup)
 }
 \arguments{
+\item{n}{numeric(1). Number of observations to generate. Ignored if \code{.df} is specified}
+
+\item{.db}{list. Named list of data.frames for use in function when scaffolding}
+
+\item{.df}{data.frame. Partially generated data table to build upon}
+
 \item{lookup}{data.frame. Data frame with possible adverse-event information to be sampled from.}
 }
 \description{

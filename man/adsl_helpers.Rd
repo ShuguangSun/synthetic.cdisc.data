@@ -134,6 +134,25 @@ usubj_deps
 
 usubj_vars
 }
+\arguments{
+\item{n}{numeric(1). Number of observations to generate. Ignored if \code{.df} is specified}
+
+\item{study_duration}{numeric(1). Study duration in years.}
+
+\item{sys_dtm}{Internal Detail.}
+
+\item{discons}{numeric(1). Number of patients who should discontinue treatment early.}
+
+\item{.df}{data.frame. Partially generated data table to build upon}
+
+\item{x}{character. Values to sample from for site id.}
+
+\item{prob}{numeric. Probabilities to use when sampling from \code{x}}
+
+\item{narms}{numeric(1). Number of arms}
+
+\item{armnms}{character. Vector of arm names}
+}
 \description{
 Helper functions and constants for ADSL
 }

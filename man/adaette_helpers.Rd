@@ -54,6 +54,18 @@ adaette_cnsrdtdsc(n, .df, evnt_sel = evntdescr_sel, cns_sel = cnsdtdscr_sel)
 \item{pat_info}{data.frame. ADAE data for a single subjid}
 
 \item{s_dur_secs}{numeric(1). Total study duration in seconds}
+
+\item{.db}{list. Named list of data.frames for use in function when scaffolding}
+
+\item{lookup}{data.frame. Table of lookup values specific to the function at hand.}
+
+\item{n}{numeric(1). Number of observations to generate. Ignored if \code{.df} is specified}
+
+\item{.df}{data.frame. Partially generated data table to build upon}
+
+\item{evnt_sel}{character. Event descriptions to sample from.}
+
+\item{cns_sel}{character. Reasons for censoring to sample from.}
 }
 \description{
 ADAETTE recipe helper constants and functions

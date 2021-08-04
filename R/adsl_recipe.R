@@ -4,6 +4,7 @@
 #' Helper functions and constants for ADSL
 #'
 #' @rdname adsl_helpers
+#' @inheritParams gen_args
 #' @export
 s_countries <- c("CHN", "USA", "BRA", "PAK", "NGA", "RUS", "JPN", "GBR", "CAN", "CHE")
 #' @rdname adsl_helpers
@@ -68,6 +69,9 @@ s_bmrkr2 <- c("LOW", "MEDIUM", "HIGH")
 trtdtm_varnames <- c("TRTSDTM", "RANDDT", "TRTEDTM")
 
 #' @rdname adsl_helpers
+#' @param study_duration numeric(1). Study duration in years.
+#' @param sys_dtm Internal Detail.
+#' @param discons numeric(1). Number of patients who should discontinue treatment early.
 #' @export
 sample_trtdtmvars<- function(n, study_duration = 2,
                            sys_dtm = as.numeric(strptime("20/2/2019 11:16:16.683", "%d/%m/%Y %H:%M:%OS")),
@@ -126,6 +130,8 @@ make_eosvars <- function(.df, n = NROW(.df)) {
 }
 
 #' @rdname adsl_helpers
+#' @param x character. Values to sample from for site id.
+#' @param prob numeric. Probabilities to use when sampling from \code{x}
 #' @export
 sample_siteid <- function(.df, n, x, prob) {
     raw <- sample_fct(x = x, prob = prob, n = n)
@@ -139,6 +145,8 @@ sample_siteid <- function(.df, n, x, prob) {
 #' @export
 arm_varnames <- c("ARM", "ARMCD", "ACTARM", "ACTARMCD")
 #' @rdname adsl_helpers
+#' @param narms numeric(1). Number of arms
+#' @param armnms character. Vector of arm names
 #' @export
 sample_armcd <- function(n, narms = 3, armnms = c("ARM A" = "A: Drug X", "ARM B" = "B: Placebo", "ARM C" = "C: Combination") ) {
     armcd <- sample_fct(paste("ARM", LETTERS[1:narms]), n = n)
@@ -258,9 +266,14 @@ usubj_vars <- c("SITEID", "INVID", "USUBJID")
 #'
 #' @examples
 #'
-#' adsl_recipe
+#' adsl <- gen_table_data(N = 10, adsl_tbl_recipe)
+#' adae <- gen_reljoin_table(adae_scaff_recipe, adae_tbl_recipe, db = list(ADSL = adsl))
+#' adtte <- gen_reljoin_table(tte_scaff_recipe, tte_tbl_recipe, db = list(ADSL = adsl))
 #'
-#' adsl <- gen_table_data(N = 10, adsl_recipe)
+#' adaette <- gen_reljoin_table(adaette_scaff_recipe, adaette_tbl_recipe,
+#'                              db = list(ADSL = adsl, ADAE = adae))
+#'
+#' #TODO adcm <- gen_reljoin_table(acdm_scaff_recipe, adcm_tbl_recipe, db = list(ADSL = adsl))
 #'
 adsl_tbl_recipe <- tribble(
   ~variables,       ~dependencies,   ~func,                  ~func_args,

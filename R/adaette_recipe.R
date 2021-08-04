@@ -2,6 +2,7 @@
 #' ADAETTE recipe helper constants and functions
 #' @export
 #' @rdname adaette_helpers
+#' @inheritParams gen_args
 adaette_fdeps <- c("STUDYID", "TRTSDTM", "SITEID", "ARM", "ASTDTM")
 
 #' @export
@@ -162,6 +163,8 @@ cnsdtdscr_sel <- c(
 )
 
 #' @rdname adaette_helpers
+#' @param evnt_sel character. Event descriptions to sample from.
+#' @param cns_sel character. Reasons for censoring to sample from.
 #' @export
 adaette_cnsrdtdsc <- function(n, .df, evnt_sel = evntdescr_sel, cns_sel = cnsdtdscr_sel ) {
 
@@ -200,8 +203,6 @@ adaette_cnsrdtdsc <- function(n, .df, evnt_sel = evntdescr_sel, cns_sel = cnsdtd
 #' @export
 #' @examples
 #'
-#' adaette <- gen_reljoin_table(adaette_sjrec, adaette_recipe,
-#'                              db = list(ADSL = adsl, ADAE = adae))
 adaette_tbl_recipe <- tribble(
     ~variables, ~dependencies, ~func, ~func_args, ~keep,
     c("CNSDTDSC", "EVNTDESC"), "CNSR", adaette_cnsrdtdsc, NULL, TRUE)
