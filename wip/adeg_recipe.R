@@ -132,7 +132,7 @@ gen_eg_aspid <- function(n, .df, ...) {
   })
   retdf <- do.call(rbind, rowgroups)
   o <- order(retdf$rownum)
-  retdf[o]
+  tibble(ASPID = retdf[o, "ASPID"])
 }
 
 
@@ -246,7 +246,7 @@ gen_eg_bnrind <- function(n, .df, ...) {
 }
 
 
-#' Generate Change from Baseline Values
+#' Generate Changes from Baseline Values
 #'
 #' @param n not used
 #' @param .df data frame with required variables `AVISITN`, `AVAL`, and `BASE`
@@ -263,7 +263,7 @@ gen_eg_chg <- function(n, .df, ...) {
 }
 
 
-#' Generate Percent Change from Baseline Values
+#' Generate Percent Changes from Baseline Values
 #'
 #' @param n not used
 #' @param .df data frame with required variables `AVISITN`, `CHG`, and `BASE`
@@ -418,23 +418,22 @@ gen_eg_wors02fl <- function(n, .df, ...) {
 }
 
 
-#' Generate Analysis Datetime
+#' Generate Analysis Datetimes
 #'
 #' @param n not used
 #' @param .df data frame with required variables `TRTSDTM` and `TRTEDTM`
-#' @param study_duration duration of the study in seconds
+#' @param study_duration duration of the study in years
 #'
 #' @examples
-#' gen_eg_adtm(NULL,
-#'               data.frame(TRTSDTM = "2018-04-01 14:03:04 EST",
-#'                          TRTEDTM = "2021-09-26 09:43:22 EST"))
+#' gen_eg_adtm(NULL, data.frame(TRTSDTM = c("2018-04-01 14:03:04 EST", "2018-04-01 14:03:04 EST"),
+#'                              TRTEDTM = c("2021-09-26 09:43:22 EST", "2021-09-26 09:43:22 EST")))
 #'
 gen_eg_adtm <- function(n, .df, study_duration = 2, ...) {
   study_duration_secs <- secs_per_year * study_duration
   trtsdt_int <- as.numeric(as.Date(.df$TRTSDTM))
   trtedt_int <- dplyr::case_when(!is.na(.df$TRTEDTM) ~ as.numeric(as.Date(.df$TRTEDTM)),
-                          is.na(.df$TRTEDTM) ~ floor(trtsdt_int + (study_duration_secs) / 86400))
-  tibble(ADTM = as.POSIXct((sample(trtsdt_int:trtedt_int, size = 1) * 86400), origin = "1970-01-01"))
+                                 is.na(.df$TRTEDTM) ~ floor(trtsdt_int + (study_duration_secs) / 86400))
+  tibble(ADTM = as.POSIXct(mapply(trtsdt_int, trtedt_int, FUN = function(s, e) sample(s:e, size = 1) * 86400), origin = "1970-01-01"))
 }
 
 
@@ -444,9 +443,8 @@ gen_eg_adtm <- function(n, .df, study_duration = 2, ...) {
 #' @param .df data frame with required variables `TRTSDTM` and `TRTEDTM`
 #'
 #' @examples
-#' gen_eg_ady(NULL,
-#'              data.frame(ADTM = "2021-11-20 19:00:00",
-#'                         TRTSDTM = "2018-04-01 14:03:04 EST"))
+#' gen_eg_ady(NULL, data.frame(ADTM = c("2018-05-01 14:03:04 EST", "2021-11-20 19:00:00"),
+#'                             TRTSDTM = c("2018-04-01 14:03:04 EST", "2018-04-01 14:03:04 EST")))
 #'
 gen_eg_ady <- function(n, .df, ...) {
   tibble(ADY = ceiling(as.numeric(difftime(.df$ADTM, .df$TRTSDTM, units = "days"))))

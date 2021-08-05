@@ -49,7 +49,7 @@ gen_vs_seq <- function(n, .df, ...) {
   rowgroups <- lapply(spl, function(spli) {
     data.frame(rownum = spli,
                ASEQ = seq_along(spli),
-               EGSEQ = seq_along(spli))
+               VSSEQ = seq_along(spli))
   })
   retdf <- do.call(rbind, rowgroups)
   o <- order(retdf$rownum)
@@ -79,7 +79,7 @@ gen_vs_vstest <- function(n, .df, ...) {
 #'
 #' @examples
 #' x <- data.frame(A = 1:10)
-#' gen_vs_vscat(nrow(x), x)
+#' gen_vs_vscat(nrow(x), NULL)
 #'
 gen_vs_vscat <- function(n, .df, ...) {
   tibble(VSCAT = rep("VITAL SIGNS", n))
@@ -88,12 +88,12 @@ gen_vs_vscat <- function(n, .df, ...) {
 
 #' Generate Analysis Values
 #'
-#' @param n not used
-#' @param .df data frame
+#' @param n number of rows
+#' @param .df not used
 #'
 #' @examples
 #' x <- data.frame(ID = rep(1:10, each = 3))
-#' gen_vs_aval(nrow(x), x)
+#' gen_vs_aval(nrow(x), NULL)
 #'
 gen_vs_aval <- function(n, .df, ...) {
   tibble(AVAL = rnorm(n, mean = 50, sd = 8))
@@ -130,7 +130,7 @@ gen_vs_aspid <- function(n, .df, ...) {
   })
   retdf <- do.call(rbind, rowgroups)
   o <- order(retdf$rownum)
-  retdf[o]
+  tibble(ASPID = retdf[o, "ASPID"])
 }
 
 
@@ -150,7 +150,7 @@ gen_vs_atptn <- function(n, .df, ...) {
 
 #' Generate Baseline Values and Type
 #'
-#' @param n number of rows
+#' @param n not used
 #' @param .df data frame with required variables `AVAL`, `ABLFL`, and `ABLFL2`
 #'
 #' @examples
@@ -171,8 +171,8 @@ gen_vs_base <- function(n, .df, ...) {
 
 #' Generate Analysis Baseline Flags
 #'
-#' @param n number of rows
-#' @param .df data frame with required variables `AVISIT`
+#' @param n not used
+#' @param .df data frame with required variable `AVISIT`
 #' @param visit_format
 #'
 #' @examples
@@ -201,8 +201,8 @@ gen_vs_ablfl <- function(n, .df, visit_format = "WEEK", ...) {
 #'            ABLFL = sample(c("Y", ""), 10, replace = TRUE),
 #'            ABLFL2 = sample(c("Y", ""), 10, replace = TRUE))
 #' gen_vs_chg(NULL,
-#'              cbind(data.frame(AVAL = gen_vs_aval(nrow(x), x)),
-#'                    gen_vs_base(NULL, data)))
+#'            cbind(data.frame(AVAL = gen_vs_aval(nrow(x), x)),
+#'                  gen_vs_base(NULL, data)))
 #'
 gen_vs_chg <- function(n, .df, ...) {
   tibble(CHG2 = .df$AVAL - .df$BASE2,
@@ -221,11 +221,10 @@ gen_vs_chg <- function(n, .df, ...) {
 #'            AVAL = gen_vs_aval(nrow(x), x),
 #'            ABLFL = sample(c("Y", ""), 10, replace = TRUE),
 #'            ABLFL2 = sample(c("Y", ""), 10, replace = TRUE))
-#' gen_vs_pchg(NULL,
-#'               cbind(gen_vs_base(NULL, data),
-#'                     gen_vs_chg(NULL,
-#'                          cbind(data.frame(AVAL = gen_vs_aval(nrow(x), x)),
-#'                                gen_vs_base(NULL, data)))))
+#' gen_vs_pchg(NULL, cbind(gen_vs_base(NULL, data),
+#'                      gen_vs_chg(NULL,
+#'                      cbind(data.frame(AVAL = gen_vs_aval(nrow(x), x)),
+#'                            gen_vs_base(NULL, data)))))
 #'
 gen_vs_pchg <- function(n, .df, ...) {
   tibble(PCHG2 = 100 * (.df$CHG2 / .df$BASE2),
@@ -256,7 +255,7 @@ gen_vs_dtype <- function(n, .df, ...) {
 #'
 #' @examples
 #' x <- data.frame(A = 1:10)
-#' gen_vs_avisit(nrow(x), x)
+#' gen_vs_avisit(nrow(x), NULL)
 #'
 gen_vs_avisit <- function(n, .df, visit_format = "WEEK", n_assessments = 5L, ...) {
   tibble(AVISIT = rep(visit_schedule(visit_format = visit_format, n_assessments = n_assessments),
@@ -271,10 +270,10 @@ gen_vs_avisit <- function(n, .df, visit_format = "WEEK", n_assessments = 5L, ...
 #'
 #' @examples
 #' x <- data.frame(A = 1:10)
-#' gen_vs_avisitn(NULL, gen_vs_avisitn(nrow(x), x))
+#' gen_vs_avisitn(NULL, gen_vs_avisit(nrow(x), x))
 #'
 gen_vs_avisitn <- function(n, .df, ...) {
-  tibble(AVISITN = case_when(
+  tibble(AVISITN = dplyr::case_when(
           .df$AVISIT == "SCREENING" ~ -1,
           .df$AVISIT == "BASELINE" ~ 0,
           (grepl("^WEEK", .df$AVISIT) | grepl("^CYCLE", .df$AVISIT)) ~ as.numeric(.df$AVISIT) - 2,
@@ -304,15 +303,15 @@ gen_vs_anrind <- function(n, .df, ...) {
 #'
 #' @examples
 #' gen_vs_adtm(NULL,
-#'             data.frame(TRTSDTM = "2018-04-01 14:03:04 EST",
-#'                        TRTEDTM = "2021-09-26 09:43:22 EST"))
+#'             data.frame(TRTSDTM = c("2018-04-01 14:03:04 EST","2018-04-01 14:03:04 EST"),
+#'                        TRTEDTM = c("2021-09-26 09:43:22 EST", "2021-09-26 09:43:22 EST")))
 #'
 gen_vs_adtm <- function(n, .df, study_duration = 2, ...) {
   study_duration_secs <- secs_per_year * study_duration
   trtsdt_int <- as.numeric(as.Date(.df$TRTSDTM))
   trtedt_int <- dplyr::case_when(!is.na(.df$TRTEDTM) ~ as.numeric(as.Date(.df$TRTEDTM)),
                                  is.na(.df$TRTEDTM) ~ floor(trtsdt_int + (study_duration_secs) / 86400))
-  tibble(ADTM = as.POSIXct((sample(trtsdt_int:trtedt_int, size = 1) * 86400), origin = "1970-01-01"))
+  tibble(ADTM = as.POSIXct(mapply(trtsdt_int, trtedt_int, FUN = function(s, e) sample(s:e, size = 1) * 86400), origin = "1970-01-01"))
 }
 
 
@@ -322,9 +321,8 @@ gen_vs_adtm <- function(n, .df, study_duration = 2, ...) {
 #' @param .df data frame with required variables `TRTSDTM` and `TRTEDTM`
 #'
 #' @examples
-#' gen_vs_ady(NULL,
-#'            data.frame(ADTM = "2021-11-20 19:00:00",
-#'                       TRTSDTM = "2018-04-01 14:03:04 EST"))
+#' gen_vs_ady(NULL, data.frame(ADTM = c("2018-05-01 14:03:04 EST", "2021-11-20 19:00:00"),
+#'                             TRTSDTM = c("2018-04-01 14:03:04 EST", "2018-04-01 14:03:04 EST")))
 #'
 gen_vs_ady <- function(n, .df, ...) {
   tibble(ADY = ceiling(as.numeric(difftime(.df$ADTM, .df$TRTSDTM, units = "days"))))
@@ -351,12 +349,12 @@ gen_vs_loqfl <- function(n, .df, ...) {
 #' @param .df data frame with required variables `TRTSDTM`, `TRTEDTM` and `ADTM`
 #'
 #' @examples
-#' gen_vs_ontrtfl(NULL, data.frame(TRTSDTM = "2018-04-01 14:03:04 EST",
-#'                                 TRTEDTM = "2021-09-26 09:43:22 EST",
-#'                                 ADTM = "2018-09-03 20:00:00 EST"))
+#' gen_vs_ontrtfl(NULL, data.frame(TRTSDTM = c("2018-04-01 14:03:04 EST","2018-04-01 14:03:04 EST"),
+#'                                 TRTEDTM = c("2021-09-26 09:43:22 EST", "2021-09-26 09:43:22 EST"),
+#'                                 ADTM = c("2018-09-03 20:00:00 EST", "2021-09-25 09:43:22 EST")))
 #'
 gen_vs_ontrtfl <- function(n, .df, ...) {
-  tibble(ONTRTFL = factor(case_when(
+  tibble(ONTRTFL = factor(dplyr::case_when(
     is.na(.df$TRTSDTM) ~ "",
     is.na(.df$ADTM) ~ "Y",
     (.df$ADTM < .df$TRTSDTM) ~ "",
@@ -373,7 +371,7 @@ vsseqvars <- c("ASEQ", "VSSEQ")
 #'
 vs_recipe <- tribble(
   ~variables,                      ~dependencies,                      ~func,           ~func_args,                                     ~keep,
-  vsseqvars,                       "USUBJID",                          gen_vs_vsseq,    NULL,                                           TRUE,
+  vsseqvars,                       "USUBJID",                          gen_vs_seq,      NULL,                                           TRUE,
   c("VSTESTCD", "VSTEST"),         c("PARAMCD", "PARAM"),              gen_vs_vstest,   NULL,                                           TRUE,
   "VSCAT",                         no_deps,                            gen_vs_vscat,    NULL,                                           TRUE,
   "VSSTRESC",                      "AVAL",                             gen_vs_vsstresc, NULL,                                           TRUE,

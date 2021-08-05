@@ -53,8 +53,8 @@ gen_aette_param <- function(n, .df, ...) {
 #' @param study_duration_secs duration of the study in seconds
 #'
 #' @examples
-#' dtms <- data.frame(TRTSDTM = "2018-04-01 14:03:04 EST",
-#'                    TRTEDTM = "2021-09-26 09:43:22 EST")
+#' dtms <- data.frame(TRTSDTM = c("2018-04-01 14:03:04 EST","2018-04-01 14:03:04 EST"),
+#'                    TRTEDTM = c("2021-09-26 09:43:22 EST", "2021-09-26 09:43:22 EST"))
 #' gen_aette_dtms(NULL, dtms)
 #'
 gen_aette_dtms <- function(n, .df, study_duration_secs = 2 * secs_per_year) {
@@ -128,20 +128,20 @@ gen_aette_seq <- function(n, .df) {
   rowgroups <- lapply(spl, function(spli) {
     data.frame(rownum = spli,
                ASEQ = seq_along(spli),
-               TTESEQ = seq_along(spli))
+               AETTESEQ = seq_along(spli))
   })
   retdf <- do.call(rbind, rowgroups)
   o <- order(retdf$rownum)
-  retdf[o, tteseqvars]
+  retdf[o, aetteseqvars]
 }
 
 
-tteseqvars <- c("ASEQ", "TTESEQ")
+aetteseqvars <- c("ASEQ", "AETTESEQ")
 dtmvars <- c("ADTM", "ADY")
 dtmdeps <- c("TRTSDTM", "TRTEDTM")
 
 
-#' Recipe for creating ADEG CDISC Data
+#' Recipe for creating ADAETTE CDISC Data
 #'
 #' @rdname adaette_recipes
 #' @export

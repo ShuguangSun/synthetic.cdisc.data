@@ -1,7 +1,7 @@
-ae_scaff <- rand_per_key("USUBJID", mincount = 0, maxcount = 10, prop_present = 1)
+adae_scaff <- rand_per_key("USUBJID", mincount = 0, maxcount = 10, prop_present = 1)
 
-ae_sjrec <- tribble(~foreign_tbl, ~foreign_key, ~func,      ~func_args,
-                    "ADSL",       "USUBJID",    ae_scaff,   NULL)
+adae_sjrec <- tribble(~foreign_tbl, ~foreign_key, ~variables, ~dependencies, ~func,      ~func_args,
+                      "ADSL",       "USUBJID",    c("CATCD", "CAT", "LAMBDA", "CNSR_P"), no_deps, adae_scaff, NULL)
 
 lookup_ae <- tribble(
     ~AEBODSYS, ~AELLT,          ~AEDECOD,        ~AEHLT,        ~AEHLGT,      ~AETOXGR, ~AESOC, ~AESER, ~AREL,
@@ -27,8 +27,8 @@ secs_per_year <- 31556952
 #' @param .df data frame with required variables `TRTSDTM` and `TRTEDTM`
 #'
 #' @examples
-#' dtms <- data.frame(TRTSDTM = "2018-04-01 14:03:04 EST",
-#'                    TRTEDTM = "2021-09-26 09:43:22 EST")
+#' dtms <- data.frame(TRTSDTM = c("2019-03-06 14:03:04 EST", "2018-04-01 14:03:04 EST"),
+#'                    TRTEDTM = c("2021-03-06 01:41:28 EST", "2021-09-26 09:43:22 EST"))
 #' gen_ae_dtms(NULL, dtms)
 #'
 gen_ae_dtms <- function(n, .df, study_duration_secs = 2 * secs_per_year) {
@@ -65,7 +65,7 @@ gen_ae_aeterm <- function(n, .df) gsub("dcd", "trm", .df$AEDECOD, fixed = TRUE)
 #'
 gen_ae_aesev <- function(n, .df, ...) {
   stopifnot("AETOXGR" %in% names(.df))
-  tibble(AESEV = case_when(.df$AETOXGR == 1 ~ "MILD",
+  tibble(AESEV = dplyr::case_when(.df$AETOXGR == 1 ~ "MILD",
                         .df$AETOXGR %in% c(2, 3) ~ "MODERATE",
                         .df$AETOXGR %in% c(4, 5) ~ "SEVERE"))
 }
@@ -78,9 +78,9 @@ gen_ae_aesev <- function(n, .df, ...) {
 #'
 #' @examples
 #' x <- data.frame(USUBJID = rep(1:10, each = 2))
-#' aeseq_func(NULL, x)
+#' gen_ae_aeseq(NULL, x)
 #'
-#' aeseq_func(NULL, data.frame(USUBJID = c('id1', 'id1', 'id2', 'id3', 'id3', 'id3')))
+#' gen_ae_aeseq(NULL, data.frame(USUBJID = c('id1', 'id1', 'id2', 'id3', 'id3', 'id3')))
 #'
 gen_ae_aeseq <- function(n, .df) {
   spl <- split(seq_along(.df$USUBJID), .df$USUBJID)
@@ -104,9 +104,22 @@ dtmdeps <- c("TRTSDTM", "TRTEDTM")
 #' @rdname adae_recipes
 #' @export
 #'
+ae_rel_join_recipe <- tribble(
+  ~foreign_tbl, ~foreign_key, ~foreign_deps, ~variables,                            ~dependencies,  ~func,              ~func_args,
+  "ADSL",       "USUBJID",    "ARMCD",       c("CATCD", "CAT", "LAMBDA", "CNSR_P"), no_deps,        join_paramcd_ae, NULL)
+
+#' @rdname adae_recipes
+#'
+#' @export
+#'
+#' @examples
+#'
+#' ADSL <- gen_table_data(N = 10, recipe = adsl_recipe)
+#' gen_reljoin_table(adae_sjrec, ae_recipe, db = list(ADSL = ADSL))
+#'
 ae_recipe <- tribble(
   ~variables, ~dependencies, ~func,            ~func_args,                                    ~keep,
-  "AETERM",   "AEDECOD",     gen_adae_aeterm,  NULL,                                          TRUE,
-  "AESERV",   "AETOXGR",     gen_adae_aesev,   NULL,                                          TRUE,
-  dtmvars,    dtmdeps,       gen_adae_dtms,    list(study_duration_secs = 1 * secs_per_year), TRUE,
-  aeseqvars,  "USUBJID",     gen_adae_aeseq,   NULL,                                          TRUE)
+  "AETERM",   "AEDECOD",     gen_ae_aeterm,  NULL,                                          TRUE,
+  "AESERV",   "AETOXGR",     gen_ae_aesev,   NULL,                                          TRUE,
+  dtmvars,    dtmdeps,       gen_ae_dtms,    list(study_duration_secs = 1 * secs_per_year), TRUE,
+  aeseqvars,  "USUBJID",     gen_ae_aeseq,   NULL,                                          TRUE)

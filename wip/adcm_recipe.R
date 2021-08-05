@@ -31,8 +31,8 @@ secs_per_year <- 31556952
 #' @param .df data frame with required variables `TRTSDTM` and `TRTEDTM`
 #'
 #' @examples
-#' dtms <- data.frame(TRTSDTM = "2018-04-01 14:03:04 EST",
-#'                    TRTEDTM = "2021-09-26 09:43:22 EST")
+#' dtms <- data.frame(TRTSDTM = c("2018-04-01 14:03:04 EST","2018-04-01 14:03:04 EST"),
+#'                    TRTEDTM = c("2021-09-26 09:43:22 EST", "2021-09-26 09:43:22 EST"))
 #' gen_cm_dtms(NULL, dtms)
 #'
 gen_cm_dtms <- function(n, .df, study_duration_secs = 2 * secs_per_year, ...) {
